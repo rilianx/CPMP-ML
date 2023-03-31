@@ -216,11 +216,11 @@ def get_ann_state(layout):
 # Si el estado obtenido al aplicar el movimiento se puede resolver en $N-1$ pasos por el greedy $A_k=1$
 # En cualquier otro caso: $A_k=0$
 
-def generate_y(layout,N):
+def generate_y(layout,S=5, H=5, N=15):
   A=[]
   copy_lay = deepcopy(layout)
-  for i in range(5):
-    for j in range(5):
+  for i in range(S):
+    for j in range(S):
       if(i!=j):
        layout.move((i,j))
        val=greedy(layout)
@@ -257,6 +257,7 @@ def generate_model2(S=5, H=5):
   for i in range(S): sensors.append(x[:,i*S:i*S+H+1])
 
   sensor_model2 = Sequential([
+    layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
     layers.Dense(32, activation='relu')
   ])
@@ -265,12 +266,13 @@ def generate_model2(S=5, H=5):
   sensors_encodings=[]
   for i in range(S): 
     sensors_encodings.append(sensor_model2(sensors[i]))
-  state_encoding = layers.Average()(sensors_encodings)
+  state_encoding = layers.Maximum()(sensors_encodings)
 
   sensor_model = Sequential([
+    layers.Dense(256, activation='relu'),
     layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
-    layers.Dense(1, activation='sigmoid')
+    layers.Dense(1, activation='linear')
   ])
 
   k=0
@@ -297,13 +299,17 @@ def get_move(act, S=5,H=5):
       if k==act: return (i,j)
       k+=1
 
+#return a vector with the number of steps that
+#the model solved each of the layouts
+#-1 means the model cannot solve the layout in less than 10 steps
 def greedy_model(model, layouts, max_steps=10):
-  costs = dict()
+  costs = -np.ones(len(layouts))
+
   for steps in range(max_steps):
     x = []
     for i in range(len(layouts)):
       if layouts[i].unsorted_stacks==0: 
-        if i not in costs: costs[i]=steps
+        if costs[i] ==-1: costs[i]=steps
         continue
       x.append(get_ann_state(layouts[i]))
     
@@ -311,7 +317,7 @@ def greedy_model(model, layouts, max_steps=10):
     actions = model.predict(np.array(x), verbose=False)
     k=0
     for i in range(len(layouts)):
-      if i in costs: continue
+      if costs[i] != -1: continue
       act = np.argmax(actions[k])
       move = get_move(act)
       layouts[i].move(move)
