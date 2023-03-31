@@ -1,7 +1,6 @@
 import random
 import numpy as np
 from copy import deepcopy
-from statistics import mean
 
 def compute_sorted_elements(stack):
     if len(stack)==0: return 0
@@ -231,7 +230,7 @@ def generate_y(layout,N):
 
   return A
 
-def generate_data(S=5, H=5, N=10, sample_size=1000):
+def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None):
   x = []; y= [];
   n=0
   while(n<sample_size):
@@ -242,6 +241,7 @@ def generate_data(S=5, H=5, N=10, sample_size=1000):
       y_ = generate_y(copy_lay,val)
       x.append(get_ann_state(copy_lay))
       y.append(y_)
+      if lays is not None: lays.append(copy_lay)
       n=n+1
   return x, y
 
@@ -297,10 +297,9 @@ def get_move(act, S=5,H=5):
       if k==act: return (i,j)
       k+=1
 
-def greedy_model(model, layouts, limit=10):
-
+def greedy_model(model, layouts, max_steps=10):
   costs = dict()
-  for steps in range(limit):
+  for steps in range(max_steps):
     x = []
     for i in range(len(layouts)):
       if layouts[i].unsorted_stacks==0: 
@@ -309,7 +308,7 @@ def greedy_model(model, layouts, limit=10):
       x.append(get_ann_state(layouts[i]))
     
     if len(x)==0: break
-    actions = Fmodel.predict(np.array(x), verbose=False)
+    actions = model.predict(np.array(x), verbose=False)
     k=0
     for i in range(len(layouts)):
       if i in costs: continue
