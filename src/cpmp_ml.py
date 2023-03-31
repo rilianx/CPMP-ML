@@ -216,16 +216,16 @@ def get_ann_state(layout):
 # Si el estado obtenido al aplicar el movimiento se puede resolver en $N-1$ pasos por el greedy $A_k=1$
 # En cualquier otro caso: $A_k=0$
 
-def generate_y(layout,S=5, H=5, N=15):
+def generate_y(layout,S=5, N=15):
   A=[]
   copy_lay = deepcopy(layout)
   for i in range(S):
     for j in range(S):
       if(i!=j):
-       layout.move((i,j))
-       val=greedy(layout)
-       if(val>-1): val=N-val
-       A.append(max(0,val))
+        layout.move((i,j))
+        val=greedy(layout)
+        if(val>-1): val=N-val
+        A.append(max(0,val))
       layout = deepcopy(copy_lay)
 
   return A
@@ -238,7 +238,7 @@ def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None):
     copy_lay = deepcopy(layout)
     val=greedy(layout)
     if(val>-1):
-      y_ = generate_y(copy_lay,val)
+      y_ = generate_y(copy_lay,S,val)
       x.append(get_ann_state(copy_lay))
       y.append(y_)
       if lays is not None: lays.append(copy_lay)
@@ -257,7 +257,7 @@ def generate_model2(S=5, H=5):
   for i in range(S): sensors.append(x[:,i*S:i*S+H+1])
 
   sensor_model2 = Sequential([
-    layers.Dense(128, activation='relu'),
+    #layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
     layers.Dense(32, activation='relu')
   ])
@@ -266,13 +266,13 @@ def generate_model2(S=5, H=5):
   sensors_encodings=[]
   for i in range(S): 
     sensors_encodings.append(sensor_model2(sensors[i]))
-  state_encoding = layers.Maximum()(sensors_encodings)
+  state_encoding = layers.Average()(sensors_encodings)
 
   sensor_model = Sequential([
     layers.Dense(256, activation='relu'),
-    layers.Dense(128, activation='relu'),
+    #layers.Dense(128, activation='relu'),
     layers.Dense(64, activation='relu'),
-    layers.Dense(1, activation='linear')
+    layers.Dense(1, activation='sigmoid')
   ])
 
   k=0
@@ -325,11 +325,10 @@ def greedy_model(model, layouts, max_steps=10):
   return costs
 
 def greedys(layouts):
-  costs = dict()
+  costs = -np.ones(len(layouts))
   for k in range(len(layouts)):
     steps = greedy(layouts[k])
-    if steps!=-1:
-      costs[k]=steps
+    costs[k]=steps
   return costs
 
 
