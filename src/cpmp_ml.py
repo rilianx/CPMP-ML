@@ -232,20 +232,18 @@ def generate_y(layout,N):
   return A
 
 def generate_data(S=5, H=5, N=10, sample_size=1000):
-  x = []; y= []; lays = []
+  x = []; y= [];
   n=0
   while(n<sample_size):
     layout = generate_random_layout(S,H,N)
     copy_lay = deepcopy(layout)
-    copy_lay.stacks
-    val=greedy (layout)
+    val=greedy(layout)
     if(val>-1):
-      listeichon = generate_y(copy_lay,val)
+      y_ = generate_y(copy_lay,val)
       x.append(get_ann_state(copy_lay))
-      y.append(listeichon)
-      lays.append(copy_lay)
+      y.append(y_)
       n=n+1
-  return x, y, lays
+  return x, y
 
 
 ## THE MODEL
