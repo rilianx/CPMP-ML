@@ -250,6 +250,15 @@ def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None):
 import tensorflow as tf
 from tensorflow.keras import layers, Input, Sequential, Model, optimizers
 
+def generate_model(S=5, H=5):
+   model = tf.keras.Sequential()
+   model.add(layers.Dense(256, activation='relu', input_shape=(S*(H+1)+2*(S*(S-1)),)))
+   model.add(layers.Dense(128, activation='relu'))
+   model.add(layers.Dense(128, activation='relu'))
+   model.add(layers.Dense(64, activation='relu'))
+   model.add(layers.Dense(S*(S-1), activation='sigmoid'))
+   return model
+
 def generate_model2(S=5, H=5):
   x = Input(shape=(S*(H+1)+2*(S*(S-1)),)) #recibe el estado + tipo de movs
 
