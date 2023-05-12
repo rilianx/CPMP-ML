@@ -39,11 +39,7 @@ class Layout:
     def permutate(self,perm):
       self.stacks=[self.stacks[i] for i in perm]
       self.sorted_elements=[self.sorted_elements[i] for i in perm]
-      self.sorted_stack=[self.sorted_stack for i in perm]
-
-      
-
-
+      self.sorted_stack=[self.sorted_stack[i] for i in perm]
 
     
     def move(self,move):
@@ -229,7 +225,18 @@ def generate_y(layout,S=5, N=15):
 
   return A
 
-def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None):
+## GREEDY+MODEL
+def get_move(act, S=5,H=5):
+  k=0
+  for i in range(S):
+    for j in range(H):
+      if(i==j): continue
+      if k==act: return (i,j)
+      k+=1
+
+       
+
+def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5):
   x = []; y= [];
   n=0
   while(n<sample_size):
@@ -237,11 +244,16 @@ def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None):
     copy_lay = deepcopy(layout)
     val=greedy(layout)
     if(val>-1):
-      y_ = generate_y(copy_lay,S,val)
-      x.append(get_ann_state(copy_lay))
-      y.append(y_)
-      if lays is not None: lays.append(copy_lay)
-      n=n+1
+      for k in range(perms_by_layout):
+        enum_stacks = list(range(S))
+        perm = random_permutation = random.sample(enum_stacks, S)
+        copy_lay.permutate(perm)
+
+        y_ = generate_y(copy_lay,S,val)
+        x.append(get_ann_state(copy_lay))
+        y.append(y_)
+        if lays is not None: lays.append(copy_lay)
+        n=n+1
   return x, y
 
 
@@ -298,14 +310,7 @@ def generate_model2(S=5, H=5):
 
   return model
 
-## GREEDY+MODEL
-def get_move(act, S=5,H=5):
-  k=0
-  for i in range(S):
-    for j in range(H):
-      if(i==j): continue
-      if k==act: return (i,j)
-      k+=1
+
 
 #return a vector with the number of steps that
 #the model solved each of the layouts
