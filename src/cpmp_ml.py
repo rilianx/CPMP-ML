@@ -19,11 +19,6 @@ class Layout:
         self.unsorted_stacks = 0
         self.steps = 0
         self.H = H
-        self.full_stacks = 0
-        self.last_sd = None
-        self.prev_move=None
-        self.dismantling_stack=None
-        self.max_item=max(set().union(*stacks))
         self.G=0
         
         j=0
@@ -34,13 +29,22 @@ class Layout:
               if self.G<g: self.G=g
 
             self.total_elements += len(stack)
-            if len(stack) == self.H: self.full_stacks+=1
             self.sorted_elements.append(compute_sorted_elements(stack))
             if not self.is_sorted_stack(j):
                 self.unsorted_stacks += 1
                 self.sorted_stack.append(False)
             else: self.sorted_stack.append(True)
             j += 1
+
+    def permutate(self,perm):
+      self.stacks=[self.stacks[i] for i in perm]
+      self.sorted_elements=[self.sorted_elements[i] for i in perm]
+      self.sorted_stack=[self.sorted_stack for i in perm]
+
+      
+
+
+
     
     def move(self,move):
         i = move[0]; j=move[1]
@@ -49,20 +53,13 @@ class Layout:
         if len(self.stacks[i]) == 0: return None
         if len(self.stacks[j]) == self.H: return None
         
-        if len(self.stacks[i]) == self.H: self.full_stacks -= 1
-        if len(self.stacks[j]) == self.H-1: self.full_stacks += 1
-        
         c = self.stacks[i][-1]
 
         if self.is_sorted_stack(i):
             self.sorted_elements[i] -= 1
-            self.prev_move = "g"
-        else:  self.prev_move ="b"
-            
+   
         if self.is_sorted_stack(j) and self.gvalue(j) >= c:
             self.sorted_elements[j] += 1
-            self.prev_move += "g"
-        else: self.prev_move += "b"
             
         self.stacks[i].pop(-1)
         self.stacks[j].append(c)
@@ -172,6 +169,8 @@ def greedy(layout):
    return steps
 
 ###############
+
+
 
 
 
