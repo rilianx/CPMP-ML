@@ -252,7 +252,7 @@ def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5
         y_ = generate_y(copy_lay,S,val)
         x.append(get_ann_state(copy_lay))
         y.append(y_)
-        if lays is not None: lays.append(copy_lay)
+        if lays is not None: lays.append(deepcopy(copy_lay))
         n=n+1
   return x, y
 
