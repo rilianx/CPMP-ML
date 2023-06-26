@@ -221,6 +221,18 @@ def get_ann_state(layout):
 
   return b
 
+def get_layout_from_ann_state(b, S, H, N):
+    # Reconstruir las pilas
+    stacks = []
+    for i in range(S):
+        stack = b[i * (H + 1) : (i + 1) * (H + 1)]
+        # Ignorar el primer elemento que es is_sorted_stack
+        stack = stack[1:]
+        # Recuperar los elementos de la pila
+        stack_elements = [int(k * N) for k in stack if k != 2.0]
+        stacks.append(stack_elements)
+    return stacks
+
 ## INITIAL DATA GENERATION
 # lay es un **estado resolubles óptimamete** en $N$ 
 # pasos por un ***lazy greedy*** y. La función genera un 
@@ -262,9 +274,9 @@ def gen_movement_matrix(y, S):
 
 def permutate_y(y, S, perm):
     m = gen_movement_matrix(y, S)
-    print(m)
+    # print(m)
     m = m[perm].T[perm].T
-    print(m)
+    # print(m)
     A=np.zeros(shape= (S*(S-1)))
     n=0
     for i in range(S):
