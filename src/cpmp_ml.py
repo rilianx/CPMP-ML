@@ -285,31 +285,117 @@ def get_move(act, S=5,H=5):
 
        
 
-def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5):
-  x = []; y= [];
-  n=0
-  while(n<sample_size):
-    layout = generate_random_layout(S,H,N)
-    copy_lay = deepcopy(layout)
-    val=greedy(layout)
-    if(val>-1):
-      for k in range(perms_by_layout):
-        enum_stacks = list(range(S))
-        perm = random_permutation = random.sample(enum_stacks, S)
-        copy_lay.permutate(perm)
+def generate_data(
+    S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5, verbose=False
+):
+    x = []
+    y = []
+    n = 0
+    while n < sample_size:
+        layout = generate_random_layout(S, H, N)
+        copy_lay = deepcopy(layout)
+        val = greedy(layout)
+        if val > -1:
+            for _ in range(perms_by_layout):
+                enum_stacks = list(range(S))
+                perm = random.sample(enum_stacks, S)
+                copy_lay.permutate(perm)
 
-        y_ = generate_y(copy_lay,S,val)
-        x.append(get_ann_state(copy_lay))
-        y.append(y_)
-        if lays is not None: lays.append(deepcopy(copy_lay))
-        n=n+1
-  return x, y
+                y_ = generate_y(copy_lay, val)
+                x.append(get_ann_state(copy_lay))
+                y.append(y_)
+                if lays is not None:
+                    lays.append(deepcopy(copy_lay))
+                n = n + 1
+    return x, y
+
+
+# generate new data by using the model to solve layouts
+def generate_data2(
+    model,
+    S=5,
+    H=5,
+    N=10,
+    sample_size=1000,
+    max_steps=20,
+    lays=[],
+    batch_size=1000,
+    perms_by_layout=20,
+):
+    x = []
+    y = []
+
+    while True:
+        for i in range(batch_size):
+            lays.append(generate_random_layout(S, H, N))
+            # print ("Layout generado:", lays[i].stacks)
+
+        lays0 = deepcopy(lays)
+        costs = greedy_model(model, lays, max_steps=max_steps)
+
+        # lays that cannot be solved by the model
+        # lays0 = [lays0[i] for i in range(batch_size) if costs[i]==-1]
+        # lays = [lays[i] for i in range(batch_size) if costs[i]==-1]
+        # print("Costo obtenido por modelo:", len(lays))
+
+        # for each lay we generate children clays
+        clays = []
+        for p in range(len(lays)):
+            for i in range(S):
+                for j in range(S):
+                    if i == j:
+                        continue
+                    clay = deepcopy(lays0[p])
+                    clay.move((i, j))
+                    clays.append(clay)
+            # print("len clays", len(clays))
+        # print (f"clays generados {len(clays)}")
+        # clays are solved
+
+        ccosts = greedy_model(model, clays, max_steps=max_steps)
+        # print("costs", ccosts)
+
+        # f = lambda parent, k: (parent * (S*(S-1))) + k
+
+        # Para cada padre
+        for p in range(len(lays)):
+            # print(lays[p].stacks)
+            # print (ccosts[p*S*(S-1):(p+1)*S*(S-1)])
+            A = []
+            mincost = np.inf
+            for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
+                if ccosts[c] != -1 and ccosts[c] < mincost:
+                    mincost = ccosts[c]
+
+            if costs[p] != -1 and mincost >= costs[p]:
+                continue
+
+            for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
+                if ccosts[c] != -1 and ccosts[c] == mincost:
+                    A.append(1)
+                else:
+                    A.append(0)
+
+            if (
+                sum(A) > 0
+            ):  # otherwise no action was succesful, we simply discard the data
+                for k in range(perms_by_layout):
+                    enum_stacks = list(range(S))
+                    perm = random.sample(enum_stacks, S)
+                    lays0[p].permutate(perm)
+                    A = permutate_y(A, perm)
+
+                    x.append(get_ann_state(lays0[p]))
+                    y.append(deepcopy(A))
+                    if len(x) == sample_size:
+                        return x, y
+
 
 
 ## THE MODEL
-import_tf();
 
 def generate_model(S=5, H=5):
+   import_tf();
    model = tf.keras.Sequential()
    model.add(layers.Dense(256, activation='relu', input_shape=(S*(H+1)+2*(S*(S-1)),)))
    model.add(layers.Dense(128, activation='relu'))
@@ -319,6 +405,7 @@ def generate_model(S=5, H=5):
    return model
 
 def generate_model2(S=5, H=5):
+  import_tf();
   x = Input(shape=(S*(H+1)+2*(S*(S-1)),)) #recibe el estado + tipo de movs
 
   sensors = []
