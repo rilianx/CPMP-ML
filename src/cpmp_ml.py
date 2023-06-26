@@ -2,6 +2,13 @@ import random
 import numpy as np
 from copy import deepcopy
 
+imported = False
+def import_tf():
+    import tensorflow as tf
+    from tensorflow.keras import layers, Input, Sequential, Model, optimizers
+    imported = True
+    return imported;
+
 def compute_sorted_elements(stack):
     if len(stack)==0: return 0
     sorted_elements=1
@@ -258,8 +265,7 @@ def generate_data(S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5
 
 
 ## THE MODEL
-import tensorflow as tf
-from tensorflow.keras import layers, Input, Sequential, Model, optimizers
+import_tf();
 
 def generate_model(S=5, H=5):
    model = tf.keras.Sequential()
