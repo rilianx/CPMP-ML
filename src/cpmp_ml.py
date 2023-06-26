@@ -249,6 +249,31 @@ def generate_y(layout, N=15, v = False):
 
   return A
 
+def gen_movement_matrix(y, S):
+    m = np.zeros(shape = (S, S));
+    n=0
+    for i in range(S):
+        for j in range(S):
+            if i == j: 
+                continue
+            m[i, j] = y[n]
+            n+=1
+    return m
+
+def permutate_y(y, S, perm):
+    m = gen_movement_matrix(y, S)
+    print(m)
+    m = m[perm].T[perm].T
+    print(m)
+    A=np.zeros(shape= (S*(S-1)))
+    n=0
+    for i in range(S):
+        for j in range(S):
+            if i == j: continue
+            A[n] = m[i, j]
+            n+=1
+    return A
+
 ## GREEDY+MODEL
 def get_move(act, S=5,H=5):
   k=0
