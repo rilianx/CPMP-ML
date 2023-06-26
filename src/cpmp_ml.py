@@ -229,19 +229,25 @@ def get_ann_state(layout):
 # Si el estado obtenido al aplicar el movimiento se puede resolver en $N-1$ pasos por el greedy $A_k=1$
 # En cualquier otro caso: $A_k=0$
 
-def generate_y(layout,S=5, N=15):
-    A=[]
-    copy_lay = deepcopy(layout)
-    for i in range(S):
-        for j in range(S):
-            if i!=j:
-                layout.move((i,j))
-            val=greedy(layout)
-            if val >-1: 
-                val=N-val
-            A.append(max(0,val))
-        layout = deepcopy(copy_lay)
-    return A
+def generate_y(layout, N=15, v = False):
+  S=len(layout.stacks)
+  A=np.zeros(S*(S-1))
+  l = deepcopy(layout)
+  n=0
+  for i in range(S):
+    for j in range(S):
+      if(i!=j):
+        l.move((i,j))
+        # print(f"Move {i} {j}")
+        steps=greedy(l)
+        if(steps < 0): A[n]=0
+        else:
+            A[n] = (1 if steps < N else 0)
+            # print("SIRVE:D")
+        l = deepcopy(layout)
+        n+=1
+
+  return A
 
 ## GREEDY+MODEL
 def get_move(act, S=5,H=5):
