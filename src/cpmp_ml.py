@@ -10,11 +10,14 @@ def import_tf():
     return imported;
 
 def compute_sorted_elements(stack):
-    if len(stack)==0: return 0
+    if len(stack) == 0: return 0
+
     sorted_elements=1
-    while(sorted_elements<len(stack) and stack[sorted_elements] <= stack[sorted_elements-1]):
+
+    while(sorted_elements < len(stack) and 
+            stack[sorted_elements] <= stack[sorted_elements-1]):
         sorted_elements +=1
-    
+
     return sorted_elements   
     
 class Layout:
@@ -31,15 +34,18 @@ class Layout:
         j=0
         
         for stack in stacks:
-            if len(stack)>0:
+            if len(stack) > 0:
               g = max(stack)
               if self.G<g: self.G=g
 
             self.total_elements += len(stack)
             self.sorted_elements.append(compute_sorted_elements(stack))
+
             if not self.is_sorted_stack(j):
+
                 self.unsorted_stacks += 1
                 self.sorted_stack.append(False)
+
             else: self.sorted_stack.append(True)
             j += 1
 
@@ -76,14 +82,19 @@ class Layout:
     def is_sorted_stack(self, j):
         sorted = len(self.stacks[j]) == self.sorted_elements[j]
 
-        if j<len(self.sorted_stack) and self.sorted_stack[j] != sorted: 
+        if (j < len(self.sorted_stack) and
+                self.sorted_stack[j] != sorted): 
+
             self.sorted_stack[j] = sorted
+
             if sorted == True: self.unsorted_stacks -= 1
+
             else: self.unsorted_stacks += 1
+
         return sorted
 
     def gvalue(self, i):
-        if len(self.stacks[i])==0: return self.G
+        if len(self.stacks[i]) == 0: return self.G
         else: return self.stacks[i][-1]
 
 def reachable_height(layout, i):
@@ -131,11 +142,11 @@ def generate_random_layout(S,H,N, feasible = False):
 
 # GREEDY ##
 def is_valid_BG_move(layout, s_o, s_d):
-    if s_o != s_d  and len(layout.stacks[s_o]) > 0 \
-    and  len(layout.stacks[s_d]) < layout.H \
-    and layout.is_sorted_stack(s_o)==False \
-    and layout.is_sorted_stack(s_d)==True \
-    and layout.gvalue(s_o) <= layout.gvalue(s_d):
+    if (s_o != s_d  and len(layout.stacks[s_o]) > 0
+    and  len(layout.stacks[s_d]) < layout.H
+    and layout.is_sorted_stack(s_o)==False
+    and layout.is_sorted_stack(s_d)==True
+    and layout.gvalue(s_o) <= layout.gvalue(s_d)):
       return True
 
     else: return False
@@ -147,30 +158,30 @@ def select_bg_move(layout):
   for s_o in range(S):
      for s_d in range(S):
        if is_valid_BG_move(layout, s_o, s_d):
-          diff = layout.gvalue(s_d)-layout.gvalue(s_o)
+          diff = layout.gvalue(s_d) - layout.gvalue(s_o)
           if min_diff > diff:
             min_diff = diff
             bg_move = (s_o,s_d)
   return bg_move
 
-def greedy(layout):
-  steps = 0
-  while layout.unsorted_stacks>0:
-    bg_move=select_bg_move(layout)
-    if bg_move is not None:
-      #print("bg_move:", bg_move)
-      layout.move(bg_move)
-    else:
-      #print("no hay movimiento BG posibles")
-      #print("elementos mal ubicados:", layout.total_elements - sum(layout.sorted_elements))
-      return -1 # no lo resuelve
-    steps +=1
+def greedy(layout) -> int:
+    steps = 0
+    while layout.unsorted_stacks>0:
+        bg_move=select_bg_move(layout)
+        if bg_move is not None:
+            # print("bg_move:", bg_move)
+            layout.move(bg_move)
+        else:
+            return -1 # no lo resuelve
+            # print("no hay movimiento BG posibles")
+            # print("elementos mal ubicados:",
+                # layout.total_elements - sum(layout.sorted_elements))
+        steps +=1
 
-  if layout.unsorted_stacks==0: 
-    #print("resuelto!")
-  
-   return steps
-
+    if layout.unsorted_stacks==0: 
+        # print("resuelto!")
+        return steps
+    return -1
 ###############
 
 
@@ -185,7 +196,7 @@ def greedy(layout):
 #  para cada movimiento, si la pila de destino queda ordenada o no.
 def get_ann_state(layout):
   S=len(layout.stacks)
-  b = 2.*np.ones([S,layout.H+1])
+  b = 2. * np.ones([S,layout.H+1])
   for i,j in enumerate(layout.stacks):
      b[i][layout.H-len(j)+1:] = [k/layout.total_elements for k in j]
      b[i][0] = layout.is_sorted_stack(i)
@@ -219,18 +230,18 @@ def get_ann_state(layout):
 # En cualquier otro caso: $A_k=0$
 
 def generate_y(layout,S=5, N=15):
-  A=[]
-  copy_lay = deepcopy(layout)
-  for i in range(S):
-    for j in range(S):
-      if(i!=j):
-        layout.move((i,j))
-        val=greedy(layout)
-        if(val>-1): val=N-val
-        A.append(max(0,val))
-      layout = deepcopy(copy_lay)
-
-  return A
+    A=[]
+    copy_lay = deepcopy(layout)
+    for i in range(S):
+        for j in range(S):
+            if i!=j:
+                layout.move((i,j))
+            val=greedy(layout)
+            if val >-1: 
+                val=N-val
+            A.append(max(0,val))
+        layout = deepcopy(copy_lay)
+    return A
 
 ## GREEDY+MODEL
 def get_move(act, S=5,H=5):
