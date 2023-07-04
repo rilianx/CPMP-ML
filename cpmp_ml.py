@@ -2,12 +2,6 @@ import random
 import numpy as np
 from copy import deepcopy
 
-imported = False
-def import_tf():
-    import tensorflow as tf
-    from tensorflow.keras import layers, Input, Sequential, Model, optimizers
-    imported = True
-    return imported;
 
 def compute_sorted_elements(stack):
     if len(stack) == 0: return 0
@@ -395,7 +389,7 @@ def generate_data2(
                     enum_stacks = list(range(S))
                     perm = random.sample(enum_stacks, S)
                     lays0[p].permutate(perm)
-                    A = permutate_y(A, perm)
+                    A = permutate_y(A, S, perm)
 
                     x.append(get_ann_state(lays0[p]))
                     y.append(deepcopy(A))
@@ -407,9 +401,13 @@ def generate_data2(
 ## THE MODEL
 
 def generate_model(S=5, H=5):
-   import_tf();
+   import tensorflow as tf
+   from tensorflow.keras import layers, Input, Sequential, Model, optimizers
    model = tf.keras.Sequential()
-   model.add(layers.Dense(256, activation='relu', input_shape=(S*(H+1)+2*(S*(S-1)),)))
+
+   model.add(layers.Dense(256, activation='relu',
+                          input_shape=(S*(H+1)+2*(S*(S-1)),)))
+
    model.add(layers.Dense(128, activation='relu'))
    model.add(layers.Dense(128, activation='relu'))
    model.add(layers.Dense(64, activation='relu'))
@@ -417,7 +415,6 @@ def generate_model(S=5, H=5):
    return model
 
 def generate_model2(S=5, H=5):
-  import_tf();
   x = Input(shape=(S*(H+1)+2*(S*(S-1)),)) #recibe el estado + tipo de movs
 
   sensors = []
