@@ -5,6 +5,7 @@ import argparse
 import pickle
 
 from cpmp_ml import generate_model, generate_data, generate_data2
+import benchmarking
 import numpy as np
 
 def train_model(previous_model, x, y, S, H, output, batch_size, epochs):
@@ -55,10 +56,10 @@ parser = argparse.ArgumentParser(
         )
 
 # Problem size
-parser.add_argument("-S", "--stacks", required = True)
-parser.add_argument("-H", "--height", required = True)
-parser.add_argument("-N", "--max-movements", required = True)
-parser.add_argument("-ss", "--sample-size", required = True)
+parser.add_argument("-S", "--stacks")
+parser.add_argument("-H", "--height")
+parser.add_argument("-N", "--max-movements")
+parser.add_argument("-ss", "--sample-size")
 
 parser.add_argument("-e", "--epochs")
 
@@ -67,6 +68,7 @@ parser.add_argument("-tm", "--train-model", action = "store_true")
 parser.add_argument("-tm2", "--train-model2", action = "store_true")
 parser.add_argument("-gd", "--generate-data", action = "store_true") # .h5!
 parser.add_argument("-gd2", "--generate-data2", action = "store_true") # .h5!
+parser.add_argument("-b", "--benchmarking", action = "store_true") # .h5!
 
 parser.add_argument("-i", "--input")
 parser.add_argument("-im", "--input-model")
@@ -77,6 +79,10 @@ parser.add_argument("-v", "--verbose", action = "store_true")
 args = parser.parse_args()
 
 # Sanity checks
+
+if args.benchmarking:
+    g=benchmarking.GUI()
+    g.loop()
 
 if not args.stacks:
     print("Error: -S [--stacks] is required")
@@ -159,6 +165,7 @@ elif args.generate_data2:
         with open(output, "xb") as file:
             print ("Dumping data..")
             pickle.dump([x, y], file)
+
 
 
 elif args.train_model:
