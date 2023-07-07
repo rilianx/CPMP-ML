@@ -7,7 +7,7 @@ import pickle
 from cpmp_ml import generate_model, generate_data, generate_data2
 import numpy as np
 
-def train_model(x, y, S, H, output, batch_size, epochs):
+def train_model(previous_model, x, y, S, H, output, batch_size, epochs):
     import tensorflow as tf
     from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
     from tensorflow.keras.losses import BinaryCrossentropy
@@ -22,6 +22,9 @@ def train_model(x, y, S, H, output, batch_size, epochs):
               optimizer=optimizers.Adam(learning_rate=0.001),
               metrics=['mse']
         )
+
+      if previous_model:
+        Fmodel.load_weights(previous_model)
 
       Fmodel.fit(np.array(x_train), np.array(y_train), epochs=epochs,
                  batch_size=64, verbose=True) # TODO: batch_sz = sample_sz?
@@ -66,6 +69,7 @@ parser.add_argument("-gd", "--generate-data", action = "store_true") # .h5!
 parser.add_argument("-gd2", "--generate-data2", action = "store_true") # .h5!
 
 parser.add_argument("-i", "--input")
+parser.add_argument("-im", "--input-model")
 parser.add_argument("-o", "--output")
 
 parser.add_argument("-v", "--verbose", action = "store_true")
@@ -114,6 +118,9 @@ if (args.train_model or args.train_model2) and not args.epochs:
     print("Error: no --epochs [-e] specified")
     exit(1)
 
+if (args.train_model and not args.input_model):
+    print("Warning: no --input-model [-im] specified. Training a new model.")
+
 
 # Store variables
 
@@ -155,11 +162,13 @@ elif args.generate_data2:
 
 
 elif args.train_model:
-  with open(args.input, "rb") as file:
-      print ("Loading data..")
-      [x_train,y_train] = pickle.load(file)
-      train_model(x_train, y_train, S, H, args.output,
-                  int(args.sample_size), int(args.epochs))
+    previous_model = args.input_model
+
+    with open(args.input, "rb") as file:
+        print ("Loading training data..")
+        [x_train,y_train] = pickle.load(file)
+        train_model(previous_model, x_train, y_train, S, H, args.output,
+                    int(args.sample_size), int(args.epochs))
 
 
 exit (1)
