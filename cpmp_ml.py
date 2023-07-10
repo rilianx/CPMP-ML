@@ -324,7 +324,6 @@ def generate_data2(
     N=10,
     sample_size=1000,
     max_steps=20,
-    lays=[],
     batch_size=1000,
     perms_by_layout=20,
 ):
@@ -332,6 +331,7 @@ def generate_data2(
     y = []
 
     while True:
+        lays = []
         for i in range(batch_size):
             lays.append(generate_random_layout(S, H, N))
             # print ("Layout generado:", lays[i].stacks)
