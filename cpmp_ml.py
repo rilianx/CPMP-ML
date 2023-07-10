@@ -294,16 +294,16 @@ def get_move(act, S=5,H=5):
 def random_perturbate_layout(lay, moves=5):
   S=len(lay.stacks)
 
-  last_move = None
+  last_moves = []
   for m in range(moves):
     i=random.randint(0,S-1)
     j=random.randint(0,S-1)
 
-    while (i,j)==last_move or lay.move((i,j)) == None: 
+    while (i,j) in last_moves or lay.move((i,j)) == None: 
       i=random.randint(0,S-1)
       j=random.randint(0,S-1)
 
-    last_move = (i,j)
+    last_moves.append ((i,j))
 
 def generate_data(
     S=5, H=5, N=10, 
