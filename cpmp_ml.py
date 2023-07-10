@@ -290,16 +290,35 @@ def get_move(act, S=5,H=5):
       if k==act: return (i,j)
       k+=1
 
-       
+
+def random_perturbate_layout(lay, moves=5):
+  S=len(lay.stacks)
+
+  last_move = None
+  for m in range(moves):
+    i=random.randint(0,S-1)
+    j=random.randint(0,S-1)
+
+    while (i,j)==last_move or lay.move((i,j)) == None: 
+      i=random.randint(0,S-1)
+      j=random.randint(0,S-1)
+
+    last_move = (i,j)
 
 def generate_data(
-    S=5, H=5, N=10, sample_size=1000, lays=None, perms_by_layout=5, verbose=False
+    S=5, H=5, N=10, 
+    sample_size=1000, 
+    lays=None, 
+    perms_by_layout=5, 
+    verbose=False,
+    from_feasible=False, moves=5
 ):
     x = []
     y = []
     n = 0
     while n < sample_size:
-        layout = generate_random_layout(S, H, N)
+        layout = generate_random_layout(S, H, N, feasible=from_feasible)
+        if from_feasible: random_perturbate_layout(layout, moves=moves)
         copy_lay = deepcopy(layout)
         val = greedy(layout)
         if val > -1:
