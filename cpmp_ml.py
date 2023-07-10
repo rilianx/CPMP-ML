@@ -3,6 +3,7 @@ import numpy as np
 from copy import deepcopy
 
 
+
 def compute_sorted_elements(stack):
     if len(stack) == 0: return 0
 
@@ -399,6 +400,24 @@ def generate_data2(
 
 
 ## THE MODEL
+
+# Useful for importing a pre-trained model
+def create_model(S=5, H=5):
+    import tensorflow as tf
+    from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
+    from tensorflow.keras.losses import BinaryCrossentropy
+
+    # init tf
+    device_name = tf.test.gpu_device_name()
+    print("device_name", device_name)
+    with tf.device(device_name):
+      Fmodel=generate_model(S, H) # predice steps
+      Fmodel.compile(
+              loss=BinaryCrossentropy(),
+              optimizer=optimizers.Adam(learning_rate=0.001),
+              metrics=['mse']
+        )
+      return Fmodel
 
 def generate_model(S=5, H=5):
    import tensorflow as tf

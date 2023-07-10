@@ -4,8 +4,7 @@ import sys
 import argparse
 import pickle
 
-from cpmp_ml import generate_model, generate_data, generate_data2
-import benchmarking
+from cpmp_ml import generate_model, generate_data, generate_data2, create_model
 import numpy as np
 
 def train_model(previous_model, x, y, S, H, output, batch_size=64, epochs=5):
@@ -13,24 +12,15 @@ def train_model(previous_model, x, y, S, H, output, batch_size=64, epochs=5):
     from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
     from tensorflow.keras.losses import BinaryCrossentropy
 
-    # init tf
-    device_name = tf.test.gpu_device_name()
-    print("device_name", device_name)
-    with tf.device(device_name):
-      Fmodel=generate_model(S, H) # predice steps
-      Fmodel.compile(
-              loss=BinaryCrossentropy(),
-              optimizer=optimizers.Adam(learning_rate=0.001),
-              metrics=['mse']
-        )
+    model = create_model()
 
-      if previous_model:
-        Fmodel.load_weights(previous_model)
+    if previous_model:
+      Fmodel.load_weights(previous_model)
 
-      Fmodel.fit(np.array(x_train), np.array(y_train), epochs=epochs,
-                 batch_size=64, verbose=True) # TODO: batch_sz = sample_sz?
-      print ("Dumping weights")
-      Fmodel.save_weights(output)
+    Fmodel.fit(np.array(x_train), np.array(y_train), epochs=epochs,
+               batch_size=64, verbose=True) # TODO: batch_sz = sample_sz?
+    print ("Dumping weights")
+    Fmodel.save_weights(output)
 
 
 # TODO: añadir opción de guardar la configuración con un nombre.
