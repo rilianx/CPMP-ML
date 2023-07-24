@@ -7,7 +7,7 @@ import pickle
 from cpmp_ml import generate_model, generate_data, generate_data2, create_model
 import numpy as np
 
-def train_model(previous_model, x, y, S, H, output, batch_size=64, epochs=5):
+def train_model(previous_model, x_train, y_train, S, H, output, batch_size=64, epochs=5):
     import tensorflow as tf
     from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
     from tensorflow.keras.losses import BinaryCrossentropy
