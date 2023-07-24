@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import gi
 gi.require_version('Gtk', '3.0')
@@ -22,7 +22,7 @@ class Benchmarking(Gtk.Box):
 
     model = None
     S=5;
-    H=3;
+    H=5;
     N=10;
     ss=100
 
