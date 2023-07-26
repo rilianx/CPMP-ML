@@ -1,14 +1,8 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, GLib
-import sys
-from cpmp_ml import create_model, generate_data
-import numpy as np
+from gi.repository import Gtk
 
-
-with open('lol.xml', 'r') as file:
+with open('views/benchmarking.glade', 'r') as file:
     xml = file.read()
 
 @Gtk.Template(string=xml)
@@ -23,8 +17,8 @@ class Benchmarking(Gtk.Box):
     model = None
     S=5;
     H=5;
-    N=10;
-    ss=100
+    N=15;
+    ss=1000
 
 
     @Gtk.Template.Callback()
@@ -99,32 +93,3 @@ class Benchmarking(Gtk.Box):
             print("Selected file:", selected_file)
             return selected_file
         return None
-
-class Window(Gtk.Window):
-    def __init__(self):
-        super().__init__(title = "Benchmarking")
-        self.foo = Benchmarking()
-        self.add(self.foo)
-
-
-
-print(f'Using GTK {Gtk.MAJOR_VERSION}.{Gtk.MINOR_VERSION}.{Gtk.MICRO_VERSION}')
-
-
-class MyApplication(Gtk.Application):
-    def __init__(self):
-        super().__init__(application_id="com.example.MyGtkApplication")
-        GLib.set_application_name('My Gtk Application')
-
-    def do_activate(self):
-        win = Window()
-        win.connect("destroy", Gtk.main_quit)
-        win.show_all()
-        Gtk.main()
-        
-
-
-
-app = MyApplication()
-exit_status = app.run(sys.argv)
-sys.exit(exit_status)
