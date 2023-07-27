@@ -92,6 +92,18 @@ class Layout:
         if len(self.stacks[i]) == 0: return self.G
         else: return self.stacks[i][-1]
 
+def read_file(file, H):
+    with open(file) as f:
+        S, C = [int(x) for x in next(f).split()] # read first line
+        stacks = []
+        for line in f: # read rest of lines
+            stack = [int(x) for x in line.split()[1::]]
+            #if stack[0] == 0: stack.pop()
+            stacks.append(stack)
+            
+        layout = Layout(stacks,H)
+    return layout
+
 def reachable_height(layout, i):
     if not layout.is_sorted_stack(i): return -1;
     
