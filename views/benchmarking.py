@@ -1,75 +1,72 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-from cpmp_ml import validate_model
+from cpmp_ml import validate_model, create_model
+from views.settings import Settings
+
+class Benchmarking():
+    pass
+
 
 with open('views/benchmarking.glade', 'r') as file:
     xml = file.read()
 
-@Gtk.Template(string=xml)
-class Benchmarking(Gtk.Box):
+@Gtk.Template(string=xml) # type: ignore
+class BenchmarkingView(Gtk.Box):
 
+    def __init__(self):
+        super().__init__()
+        self.settings = Settings()
 
     __gtype_name__ = "benchmarking"
 
-    input_model_btn = Gtk.Template.Child()
-    stack_count = Gtk.Template.Child()
+    input_model_btn: Gtk.Button = Gtk.Template.Child() # type: ignore
 
     model = None
-    S=5;
-    H=5;
-    N=15;
-    ss=1000
 
 
-    @Gtk.Template.Callback()
-    def openSettings(self, *args):
-        print("hello")
+    @Gtk.Template.Callback() # type: ignore
+    def open_settings_view(self, *args):
+        self.settings.show_view()
 
 
     @Gtk.Template.Callback()
     def input_model_clicked(self, *args):
         print("Select your input model")
-        f=Benchmarking.get_file()
+        f=BenchmarkingView.get_file_dialog()
         if f:
             self.input_model_btn.set_label(f.split("/")[-1])
-            self.model = create_model(self.S, self.H)
+            self.model = create_model(self.settings.S, self.settings.H)
         else: print("Error file:", f)
         pass
 
     @Gtk.Template.Callback()
     def validate_model_clicked(self, *args):
+        print("validate_model_clicked")
         if  self.model == None:
-            Gtk.MessageDialog(parent = None, flags = 0,
+            Gtk.MessageDialog(parent = self, flags = 0,
                               text = "Error: You must load a model first").run()
-        else:
-            x_test, y_test = generate_data(sample_size=self.ss, S=self.S, H=self.H, N=self.N)
-            test_loss, test_acc = self.model.evaluate(np.array(x_test), np.array(y_test))
-            print("test_loss: ", test_loss)
-            print("test_acc: ", test_acc)
+        try: 
+            validate_model(self.model, 
+                        self.settings.S,
+                        self.settings.H,
+                        self.settings.N,
+                        self.ss)
+        except RuntimeError as err:
+            # TODO:
+            # invalid_model_dialog()
+            pass
+        # else:
+        #     x_test, y_test = generate_data(sample_size=self.ss, S=self.S, H=self.H, N=self.N)
+        #     test_loss, test_acc = self.model.evaluate(np.array(x_test), np.array(y_test))
+        #     print("test_loss: ", test_loss)
+        #     print("test_acc: ", test_acc)
         pass
         
 
 
-    @Gtk.Template.Callback()
-    def stack_count_value_changed(self, spin_button, *args):
-        self.S = spin_button.get_value_as_int()
-        print("New stack count:", self.S)
-        return 0
 
-    @Gtk.Template.Callback()
-    def stack_height_value_changed(self, spin_button, *args):
-        self.H = spin_button.get_value_as_int()
-        print("New stack height:", self.H)
-        return 0
-
-    @Gtk.Template.Callback()
-    def container_count_value_changed(self, spin_button, *args):
-        self.N = spin_button.get_value_as_int()
-        print("New container count:", self.N)
-        return 0
-
-    @Gtk.Template.Callback()
+    @Gtk.Template.Callback() # type: ignore
     def sample_size_input_changed(self, spin_button, *args):
         self.ss = spin_button.get_value_as_int()
         print("New random sample size:", self.ss)
@@ -79,7 +76,7 @@ class Benchmarking(Gtk.Box):
 
 
 
-    def get_file():
+    def get_file_dialog():
         dialog = Gtk.FileChooserDialog(
                 title="Select a file",
                 parent=None,

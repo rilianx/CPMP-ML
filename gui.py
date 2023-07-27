@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import sys
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
-import sys
-from views.benchmarking import Benchmarking
+
+from views.benchmarking import BenchmarkingView
+# from views.settings import SettingsView
 
 class Window(Gtk.Window):
     def __init__(self):
         super().__init__(title = "Benchmarking")
         self.rootView = Gtk.Box()
         self.rootView.set_orientation(Gtk.Orientation.VERTICAL)
-        self.contentView = Benchmarking()
+        self.contentView = BenchmarkingView()
         self.add(self.rootView)
+
+        # Allow child to grow
         self.rootView.pack_start(self.contentView, True, True, 0)
 
 class App(Gtk.Application):
