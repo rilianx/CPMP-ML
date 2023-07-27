@@ -1,6 +1,7 @@
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
+from cpmp_ml import validate_model
 
 with open('views/benchmarking.glade', 'r') as file:
     xml = file.read()
@@ -22,6 +23,11 @@ class Benchmarking(Gtk.Box):
 
 
     @Gtk.Template.Callback()
+    def openSettings(self, *args):
+        print("hello")
+
+
+    @Gtk.Template.Callback()
     def input_model_clicked(self, *args):
         print("Select your input model")
         f=Benchmarking.get_file()
@@ -32,7 +38,7 @@ class Benchmarking(Gtk.Box):
         pass
 
     @Gtk.Template.Callback()
-    def test_model_clicked(self, *args):
+    def validate_model_clicked(self, *args):
         if  self.model == None:
             Gtk.MessageDialog(parent = None, flags = 0,
                               text = "Error: You must load a model first").run()

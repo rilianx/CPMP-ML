@@ -2,6 +2,46 @@ import random
 import numpy as np
 from copy import deepcopy
 
+def load_model(model_file):
+  import tensorflow as tf
+  from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
+  from tensorflow.keras.losses import BinaryCrossentropy
+  device_name = tf.test.gpu_device_name()
+  with tf.device(device_name):
+    model=generate_model(S, H) # predice steps
+    model.compile(
+          loss=BinaryCrossentropy(),
+          optimizer=optimizers.Adam(learning_rate=0.001),
+          metrics=['mse']
+    )
+    model.load_weights(model_file)
+  return model
+
+def validate_model(model_file, S, H, N, n = 1000, cvs_class=None):
+  model = load_model(model_file)
+
+  lays = []
+  if cvs_class is None:
+    for i in range(n):
+      lays.append(generate_random_layout(S,H,N))
+  else:
+    n=40
+    for i in range(1,n+1):
+      lay = read_file(f"benchmarks/CVS/{cvs_class}/data{cvs_class}-{i}.dat",5)
+      lays.append(lay)
+
+  lays1 = deepcopy(lays)
+  costs1 = greedy_model(model, lays1, max_steps=N*2)
+  costs2 = greedys(lays)
+
+  valid_costs1 = [v for v in costs1 if v!=-1]
+  valid_costs2 = [v for v in costs2 if v!=-1]
+
+  print("success ann model (%):", len(valid_costs1)/n*100., mean(valid_costs1))
+  if len(valid_costs2)==0:
+    print("success heuristic (%):", len(valid_costs2)/n*100.)
+  else:
+    print("success heuristic (%):", len(valid_costs2)/n*100., mean(valid_costs2))
 
 
 def compute_sorted_elements(stack):

@@ -4,11 +4,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, GLib
 import sys
-from cpmp_ml import create_model, generate_data
-import numpy as np
 from views.benchmarking import Benchmarking
-
-
 
 class Window(Gtk.Window):
     def __init__(self):
@@ -19,15 +15,10 @@ class Window(Gtk.Window):
         self.add(self.rootView)
         self.rootView.pack_start(self.contentView, True, True, 0)
 
-
-
-print(f'Using GTK {Gtk.MAJOR_VERSION}.{Gtk.MINOR_VERSION}.{Gtk.MICRO_VERSION}')
-
-
-class MyApplication(Gtk.Application):
+class App(Gtk.Application):
     def __init__(self):
-        super().__init__(application_id="com.example.MyGtkApplication")
-        GLib.set_application_name('My Gtk Application')
+        super().__init__(application_id="cpmp_ml")
+        GLib.set_application_name('CPMP toolkit')
 
     def do_activate(self):
         win = Window()
@@ -35,9 +26,8 @@ class MyApplication(Gtk.Application):
         win.show_all()
         Gtk.main()
         
-
-
-
-app = MyApplication()
-exit_status = app.run(sys.argv)
-sys.exit(exit_status)
+if __name__ == "__main__":
+    print(f'Using GTK {Gtk.MAJOR_VERSION}.{Gtk.MINOR_VERSION}.{Gtk.MICRO_VERSION}')
+    app = App()
+    exit_status = app.run(sys.argv)
+    sys.exit(exit_status)
