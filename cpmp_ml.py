@@ -1,8 +1,9 @@
 import random
 import numpy as np
 from copy import deepcopy
+from math import mean
 
-def load_model(model_file):
+def load_model(model_file, S, H):
   import tensorflow as tf
   from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
   from tensorflow.keras.losses import BinaryCrossentropy
@@ -14,11 +15,14 @@ def load_model(model_file):
           optimizer=optimizers.Adam(learning_rate=0.001),
           metrics=['mse']
     )
-    model.load_weights(model_file)
+    try:
+      model.load_weights(model_file)
+    except:
+      raise RuntimeError("Invalid model")
   return model
 
 def validate_model(model_file, S, H, N, n = 1000, cvs_class=None):
-  model = load_model(model_file)
+  model = load_model(model_file, S, H)
 
   lays = []
   if cvs_class is None:
