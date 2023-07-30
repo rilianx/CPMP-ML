@@ -248,25 +248,41 @@ def get_layout_from_ann_state(b, S, H, N):
 # Si el estado obtenido al aplicar el movimiento se puede resolver en $N-1$ pasos por el greedy $A_k=1$
 # En cualquier otro caso: $A_k=0$
 
-def generate_y(layout, N=15, v = False):
+def costs_to_y(costs, parent_cost):
+    #print (costs,parent_cost)
+    mincost = np.inf
+    y = []
+    for c in costs:
+        if c != -1 and c < mincost:
+            mincost = c
+
+    if c != -1 and mincost >= parent_cost:
+        return None
+
+    for c in costs:
+        if c == mincost:
+            y.append(1)
+        else:
+            y.append(0)
+    #print (y); error()
+    return y
+
+
+def generate_y(layout, p_cost, v = False, basic = True):
   S=len(layout.stacks)
   A=np.zeros(S*(S-1))
   l = deepcopy(layout)
-  n=0
+  n=0; costs = []
   for i in range(S):
     for j in range(S):
       if(i!=j):
         l.move((i,j))
         # print(f"Move {i} {j}")
-        steps=greedy(l)
-        if(steps < 0): A[n]=0
-        else:
-            A[n] = (1 if steps < N else 0)
-            # print("SIRVE:D")
+        costs.append(greedy(l, basic=basic))
         l = deepcopy(layout)
         n+=1
 
-  return A
+  return costs_to_y(costs, p_cost)
 
 def gen_movement_matrix(y, S):
     m = np.zeros(shape = (S, S));
@@ -333,14 +349,16 @@ def generate_data(
         layout = generate_random_layout(S, H, N, feasible=from_feasible)
         if from_feasible: random_perturbate_layout(layout, moves=moves)
         copy_lay = deepcopy(layout)
-        val = greedy(layout, basic)
-        if val > -1:
+        p_cost = greedy(layout, basic=basic)
+        if p_cost > -1:
             for _ in range(perms_by_layout):
                 enum_stacks = list(range(S))
                 perm = random.sample(enum_stacks, S)
                 copy_lay.permutate(perm)
 
-                y_ = generate_y(copy_lay, val)
+                y_ = generate_y(copy_lay, p_cost=p_cost, basic=basic)
+                if y_ is None: continue
+
                 x.append(get_ann_state(copy_lay))
                 y.append(y_)
                 if lays is not None:
