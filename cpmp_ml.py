@@ -25,7 +25,8 @@ class Layout:
         self.steps = 0
         self.H = H
         self.G=0
-        
+        self.reduced_stack = -1
+
         j=0
         
         for stack in stacks:
@@ -56,6 +57,8 @@ class Layout:
         if i==j: return None
         if len(self.stacks[i]) == 0: return None
         if len(self.stacks[j]) == self.H: return None
+
+        if not self.is_BG_action(move): self.reduced_stack = i
         
         c = self.stacks[i][-1]
 
@@ -67,6 +70,8 @@ class Layout:
             
         self.stacks[i].pop(-1)
         self.stacks[j].append(c)
+
+        if len(self.stacks[i]) == 0: self.reduced_stack = -1
         
         self.is_sorted_stack(i)
         self.is_sorted_stack(j)
@@ -171,22 +176,17 @@ def select_bg_move(layout):
             bg_move = (s_o,s_d)
   return bg_move
 
-def greedy(layout) -> int:
+def greedy(layout, basic=True) -> int:
     steps = 0
     while layout.unsorted_stacks>0:
         bg_move=select_bg_move(layout)
         if bg_move is not None:
-            # print("bg_move:", bg_move)
             layout.move(bg_move)
         else:
             return -1 # no lo resuelve
-            # print("no hay movimiento BG posibles")
-            # print("elementos mal ubicados:",
-                # layout.total_elements - sum(layout.sorted_elements))
         steps +=1
 
     if layout.unsorted_stacks==0: 
-        # print("resuelto!")
         return steps
     return -1
 ###############
@@ -323,7 +323,8 @@ def generate_data(
     lays=None, 
     perms_by_layout=5, 
     verbose=False,
-    from_feasible=False, moves=5
+    from_feasible=False, moves=5,
+    basic=True
 ):
     x = []
     y = []
@@ -332,7 +333,7 @@ def generate_data(
         layout = generate_random_layout(S, H, N, feasible=from_feasible)
         if from_feasible: random_perturbate_layout(layout, moves=moves)
         copy_lay = deepcopy(layout)
-        val = greedy(layout)
+        val = greedy(layout, basic)
         if val > -1:
             for _ in range(perms_by_layout):
                 enum_stacks = list(range(S))
