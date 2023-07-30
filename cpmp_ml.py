@@ -351,19 +351,28 @@ def generate_data(
         copy_lay = deepcopy(layout)
         p_cost = greedy(layout, basic=basic)
         if p_cost > -1:
-            for _ in range(perms_by_layout):
+            #for _ in range(perms_by_layout):
+            #enum_stacks = list(range(S))
+            #perm = random.sample(enum_stacks, S)
+            #copy_lay.permutate(perm)
+            y_ = generate_y(copy_lay, p_cost=p_cost, basic=basic)
+            if y_ is None: continue
+
+            for k in range(perms_by_layout):
                 enum_stacks = list(range(S))
                 perm = random.sample(enum_stacks, S)
                 copy_lay.permutate(perm)
-
-                y_ = generate_y(copy_lay, p_cost=p_cost, basic=basic)
-                if y_ is None: continue
+                y_ = permutate_y(y_, S, perm)
 
                 x.append(get_ann_state(copy_lay))
-                y.append(y_)
-                if lays is not None:
-                    lays.append(deepcopy(copy_lay))
-                n = n + 1
+                y.append(deepcopy(y_))
+                if len(x) == sample_size:
+                    return x, y
+                n=n+1
+                if n%5000==0: print(n)
+                if n >= sample_size: break
+
+                
     return x, y
 
 
