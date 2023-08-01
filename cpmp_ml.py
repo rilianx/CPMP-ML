@@ -141,6 +141,23 @@ class Layout:
         if len(self.stacks[i]) == 0: return self.G
         else: return self.stacks[i][-1]
 
+    def get_actions(self):
+        actions =[]
+        for i in range(len(self.stacks)):
+            for j in range(len(self.stacks)):
+                if i!=j and len(self.stacks[i]) > 0 and len(self.stacks[j]) < self.H:
+                        actions.append((i,j))
+        return actions
+
+    def is_BG_action(self, action):
+        s_o = action[0]; s_d = action[1]
+        if (self.is_sorted_stack(s_o)==False
+        and self.is_sorted_stack(s_d)==True
+        and self.gvalue(s_o) <= self.gvalue(s_d)):
+          return True
+
+        else: return False
+
 def read_file(file, H):
     with open(file) as f:
         S, C = [int(x) for x in next(f).split()] # read first line
