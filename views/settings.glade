@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.40.0 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkAdjustment" id="adjust">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment1">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="adjustment2">
+    <property name="upper">100</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="sample-size-adjust">
+    <property name="upper">999999</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <template class="settings-view" parent="GtkBox">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="margin-start">10</property>
+    <property name="margin-end">10</property>
+    <property name="margin-top">10</property>
+    <property name="margin-bottom">10</property>
+    <property name="orientation">vertical</property>
+    <property name="spacing">5</property>
+    <property name="baseline-position">bottom</property>
+    <child>
+      <object class="GtkLabel">
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="label">Stack count (S)</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinButton" id="stack_count_spinner">
+        <property name="can-focus">True</property>
+        <property name="text" translatable="yes">5</property>
+        <property name="adjustment">adjust</property>
+        <property name="numeric">True</property>
+        <property name="value">5</property>
+        <signal name="value-changed" handler="stack_count_value_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="label">Container count (N)</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinButton" id="stack_height_spinner">
+        <property name="can-focus">True</property>
+        <property name="text" translatable="yes">5</property>
+        <property name="adjustment">adjustment1</property>
+        <property name="numeric">True</property>
+        <property name="value">5</property>
+        <signal name="value-changed" handler="stack_height_value_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">3</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="label">Stack height (H)</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">4</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinButton" id="container_count_spinner">
+        <property name="can-focus">True</property>
+        <property name="text" translatable="yes">15</property>
+        <property name="adjustment">adjustment2</property>
+        <property name="numeric">True</property>
+        <property name="value">15</property>
+        <signal name="value-changed" handler="container_count_value_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">5</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel" id="sample-size-label">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="label" translatable="yes">Sample size (ss)</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">6</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSpinButton" id="sample_size_spinner">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="adjustment">sample-size-adjust</property>
+        <property name="numeric">True</property>
+        <signal name="value-changed" handler="sample_size_value_changed" swapped="no"/>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">7</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkButton" id="save_btn">
+        <property name="label" translatable="yes">Save</property>
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
+        <property name="halign">start</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">False</property>
+        <property name="position">8</property>
+      </packing>
+    </child>
+  </template>
+</interface>

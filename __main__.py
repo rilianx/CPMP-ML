@@ -12,7 +12,7 @@ def train_model(previous_model, x_train, y_train, S, H, output, batch_size=64, e
     from tensorflow.keras import (layers, Input, Sequential, Model, optimizers)
     from tensorflow.keras.losses import BinaryCrossentropy
 
-    model = create_model()
+    Fmodel = create_model()
 
     if previous_model:
       Fmodel.load_weights(previous_model)
@@ -133,6 +133,7 @@ if args.generate_data:
     with open(output, "xb") as file:
         print ("Dumping data..")
         pickle.dump([x, y], file)
+        sys.exit(0)
 
 elif args.generate_data2:
     import tensorflow as tf
@@ -218,3 +219,4 @@ else:
 
 
 
+sys.exit(0)
