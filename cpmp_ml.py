@@ -1,7 +1,7 @@
 import random
 import numpy as np
 from copy import deepcopy
-from math import mean
+from statistics import mean
 
 def load_model(model_file, S, H):
   import tensorflow as tf
