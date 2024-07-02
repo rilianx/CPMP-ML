@@ -1,0 +1,3 @@
+from cpmp_ml.generators.generate_data_v1 import generate_data_v1
+from cpmp_ml.generators.generate_data_v2 import generate_data_v2
+from cpmp_ml.generators.generate_data_v3 import generate_data_v3
