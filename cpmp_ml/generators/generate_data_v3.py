@@ -3,7 +3,6 @@ from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import generate_random_layout
 from cpmp_ml.generators.functions import permutate_y
 
-from keras.models import Model
 from copy import deepcopy
 import numpy as np
 import random
