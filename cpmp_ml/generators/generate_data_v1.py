@@ -10,31 +10,31 @@ import random
 import numpy as np
 
 # Generación de datos con los optimizadores greedy
-def generate_data_v1(S: int = None, 
-                     H: int = None, 
-                     N: int = None, 
+def generate_data_v1(S: int = -1, 
+                     H: int = -1, 
+                     N: int = -1, 
                      sample_size: int = 0, 
                      verbose: bool = False, 
                      from_feasible: bool = False, 
                      perms_by_layout: int = -1,
                      moves: int = 5,
                      solver: OptimizerStrategy = None,
-                     adapter: DataAdapter = None) -> tuple | ValueError:
+                     adapter: DataAdapter = None) -> tuple:
     
     if from_feasible and perms_by_layout == -1:
-        return ValueError("from_feasible is true, but perms_by_layout is invalid")
+        raise ValueError("from_feasible is true, but perms_by_layout is invalid")
     
-    if S is None or H is None or N is None:
-        return ValueError("S, H or N is None")
+    if S == -1 or H == -1 or N == -1:
+        raise ValueError("One of the parameters 'S', 'H' or 'N' is invalid")
     
     if sample_size == 0:
-        return ValueError("The 'sample_size' parameter is 0")
+        raise ValueError("The 'sample_size' parameter is 0")
     
     if solver is None:
-        return ValueError("'solver' is None")
+        raise ValueError("'solver' is None")
     
     if adapter is None:
-        return ValueError("'adapter' is None")
+        raise ValueError("'adapter' is None")
     
     x = []
     y = []
