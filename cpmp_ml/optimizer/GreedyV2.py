@@ -3,11 +3,12 @@ from cpmp_ml.utils import Layout
 import numpy as np
 
 class GreedyV2(OptimizerStrategy):
-    def __init__(self, max_steps:int = 20, params:list = [2.0, 2.0, 4, 2.1, 2]):
-        self.__max_steps = max_steps
+    def __init__(self, params:list = [2.0, 2.0, 4, 2.1, 2]):
         self.__params = params
 
     def solve(self, lays: np.ndarray[Layout], **kwargs):
+        self.__max_steps = kwargs["max_steps"]
+
         costs = -np.ones(lays.shape[0])
         for k in range(lays.shape[0]):
             steps = self.__greedy(lays[k])

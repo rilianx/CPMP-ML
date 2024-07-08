@@ -1,8 +1,7 @@
 from cpmp_ml.optimizer import OptimizerStrategy
 from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import generate_random_layout
-from cpmp_ml.generators.functions import permutate_y
-
+from cpmp_ml.utils.generator import permutate_y
 from copy import deepcopy
 import numpy as np
 import random
@@ -17,6 +16,7 @@ def generate_data_v3(
         sample_size: int = 0,
         batch_size: int = 0,
         perms_by_layout: int = 20,
+        **kwargs
     ) -> tuple:
 
     if adapter is None: 
@@ -37,7 +37,7 @@ def generate_data_v3(
             lays.append(generate_random_layout(S=S, H=H, N=N))
 
         lays_copy = deepcopy(lays)
-        costs = solver.solve(np.array(lays))
+        costs = solver.solve(np.array(lays), **kwargs)
 
         # for each lay we generate children clays
         child_lays = []
@@ -49,7 +49,7 @@ def generate_data_v3(
                     child_lay.move((i, j))
                     child_lays.append(child_lay)
 
-        child_costs = solver.solve(np.array(child_lays))
+        child_costs = solver.solve(np.array(child_lays), **kwargs)
 
         # for each parent to verify the existence of solutions
         for p in range(batch_size):

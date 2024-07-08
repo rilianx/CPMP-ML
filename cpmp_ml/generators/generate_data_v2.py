@@ -8,18 +8,18 @@ import numpy as np
 import random
 
 def generate_steps_state(lay: Layout, N: int, 
-                         optimizer: OptimizerStrategy, adapter: DataAdapter
-                         ) -> tuple:
+                         optimizer: OptimizerStrategy, adapter: DataAdapter,
+                         max_steps: int) -> tuple:
     cont = 0
     temp_lay = deepcopy(lay)
 
-    p_cost, moves = optimizer.solve(np.array([temp_lay]), N * 2)
+    p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps)
     if p_cost == -1 and moves is None: return None, None
 
     lays, labels = np.empty(shape=(p_cost, )), np.empty(shape=(p_cost, ))
     while lay.unsorted_stacks != 0:
         temp_lay = deepcopy(lay)
-        y_ = generate_y(temp_lay, p_cost, max_steps = N * 2)
+        y_ = generate_y(temp_lay, p_cost, optimizer, max_steps)
 
         if y_ is None: return None, None
         labels[cont] = y_
@@ -46,7 +46,7 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
         N = S * (H - 2)
 
         lay = generate_random_layout(S, H, N)
-        lays, labels = generate_steps_state(lay, N, optimizer, adapter)
+        lays, labels = generate_steps_state(lay, N, optimizer, adapter, max_steps= N * 2)
 
         if lays is None and labels is None: continue
 

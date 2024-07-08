@@ -3,9 +3,6 @@ from cpmp_ml.utils import Layout
 import numpy as np
 
 class AttentionModel(DataAdapter):
-    def __init__(self, S:int) -> None:
-        self.__S = S
-
     def get_ann_state(self, lay: Layout):
         S=len(lay.stacks) 
         
@@ -16,10 +13,10 @@ class AttentionModel(DataAdapter):
         b.shape=(S,(lay.H + 1))
         return b
 
-    def get_move(self, act: int) -> tuple:
+    def get_move(self, act: int, S: int) -> tuple:
         k=0
-        for i in range(self.__S):
-            for j in range(self.__S):
+        for i in range(S):
+            for j in range(S):
                 if(i==j): continue
                 if k==act: return (i,j)
                 k+=1

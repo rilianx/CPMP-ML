@@ -4,9 +4,9 @@ from copy import deepcopy
 import numpy as np
 import random
 
-def costs_to_y(costs: np.ndarray, parent_cost: np.ndarray) -> np.ndarray:
+def costs_to_y(costs: np.ndarray, parent_cost: int) -> None | np.ndarray:
     mincost = np.inf
-    y = np.zeros(costs)
+    y = np.zeros(costs.shape[0])
 
     filtered_costs = [c for c in costs if c != -1]
     mincost = min(filtered_costs) if filtered_costs else None
@@ -22,8 +22,7 @@ def costs_to_y(costs: np.ndarray, parent_cost: np.ndarray) -> np.ndarray:
 
     return y
 
-
-def generate_y(layout: Layout, p_cost: int, max_steps: int, optimizer: OptimizerStrategy) -> np.ndarray:
+def generate_y(layout: Layout, p_cost: int, optimizer: OptimizerStrategy, **kwargs) -> None | np.ndarray:
     S = len(layout.stacks)
     label_size = S * (S - 1)
     temp_lay = deepcopy(layout)
@@ -35,7 +34,7 @@ def generate_y(layout: Layout, p_cost: int, max_steps: int, optimizer: Optimizer
             if i == j: continue
 
             temp_lay.move((i, j))
-            costs[pos] = optimizer.solve(np.array([temp_lay]), max_steps)
+            costs[pos] = optimizer.solve(np.array([temp_lay]), **kwargs)
             pos += 1
 
     return costs_to_y(costs, p_cost)
@@ -53,11 +52,9 @@ def gen_movement_matrix(y: np.ndarray, S: int) -> np.ndarray:
 
     return m
 
-def permutate_y(y: np.ndarray, S: int, perm: int):
+def permutate_y(y: np.ndarray, S: int, perm: list):
     m = gen_movement_matrix(y, S)
-    # print(m)
     m = m[perm].T[perm].T
-    # print(m)
     A = np.zeros(shape= (S * (S - 1)))
     n = 0
 
@@ -70,8 +67,11 @@ def permutate_y(y: np.ndarray, S: int, perm: int):
 
     return A
 
-def random_perturbate_layout(lay: Layout, moves: int = 5) -> None:
-    S = len(lay.stacks)
+def random_perturbate_layout(lay:Layout, moves:int = 5) -> None | ValueError:
+    if lay is None:
+        raise ValueError("Lay is None")
+
+    S=len(lay.stacks)
 
     last_moves = []
     for _ in range(moves):

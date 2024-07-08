@@ -2,7 +2,9 @@
 from cpmp_ml.utils.functions import generate_random_layout
 from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.optimizer import OptimizerStrategy
-from cpmp_ml.generators.functions import random_perturbate_layout, generate_y, permutate_y
+from cpmp_ml.utils.generator import random_perturbate_layout
+from cpmp_ml.utils.generator import generate_y 
+from cpmp_ml.utils.generator import permutate_y
 
 # Librerias externas
 from copy import deepcopy
@@ -19,7 +21,7 @@ def generate_data_v1(S: int = -1,
                      perms_by_layout: int = -1,
                      moves: int = 5,
                      solver: OptimizerStrategy = None,
-                     adapter: DataAdapter = None) -> tuple:
+                     adapter: DataAdapter = None, **kwargs) -> tuple:
     
     if from_feasible and perms_by_layout == -1:
         raise ValueError("from_feasible is true, but perms_by_layout is invalid")
@@ -51,8 +53,8 @@ def generate_data_v1(S: int = -1,
 
         # Analizar el coste
         copy_lay = deepcopy(lay)
-        p_cost = solver.solve(np.array([copy_lay]))[0]
-        y_ = generate_y(lay=copy_lay, p_cost=p_cost, solver=solver)
+        p_cost = solver.solve(np.array([copy_lay]), **kwargs)[0]
+        y_ = generate_y(layout=copy_lay, p_cost=p_cost, optimizer= solver, **kwargs)
 
         if y_ is None: continue
 

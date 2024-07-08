@@ -9,7 +9,7 @@ class DataAdapter(ABC):
         pass
 
     @abstractmethod
-    def get_move(self, act:int) -> tuple:
+    def get_move(self, act:int, S: int) -> tuple:
         pass
     
     @abstractmethod

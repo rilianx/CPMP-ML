@@ -3,9 +3,6 @@ from cpmp_ml.utils import Layout
 import numpy as np
 
 class GreedyV1(OptimizerStrategy):
-    def __init__(self):
-        pass
-
     def solve(self, layouts: np.ndarray[Layout], **kwargs):
         costs = -np.ones(len(layouts))
         for k in range(len(layouts)):

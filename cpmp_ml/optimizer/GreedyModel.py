@@ -40,6 +40,6 @@ class GreedyModel(OptimizerStrategy):
         for i in range(lays.shape[0]):
             if costs[i] != -1: continue
             act = np.argmax(actions[k])
-            move = self.__data_adapter.get_move(act)
+            move = self.__data_adapter.get_move(act, len(lays[i].stacks))
             lays[i].move(move)
             k+=1
