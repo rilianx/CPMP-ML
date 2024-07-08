@@ -18,22 +18,23 @@ class GreedyModel(OptimizerStrategy):
         max_steps = kwargs["max_steps"]
         for steps in range(max_steps):
             x = self.__get_valid_data(steps, costs, lays)
-            if x.shape[0] == 0:break
-            actions = self.__model.predict(x, verbose=False)[0]
+            if x.shape[0] == 0: break
+            actions = self.__model.predict(x, verbose=False)
+            print(actions)
             self.__update_cost(actions, costs, lays)
 
         return costs
 
     def __get_valid_data(self, steps:int, costs:np.ndarray, lays:np.ndarray[Layout]) -> np.ndarray:
-        x = np.empty((0, *self.__data_adapter.get_ann_state(lays[0]).shape))
+        x = []
         for i in range(lays.shape[0]):
-            if lays[i].unsorted_stacks==0: 
-                if costs[i] ==-1: costs[i]=steps
-                continue
-        ann_state = self.__data_adapter.get_ann_state(lays[i])
-        
-        x = np.vstack([x, ann_state[np.newaxis, :]])
-        return x
+            if lays[i].unsorted_stacks == 0 and costs[i] == -1: 
+                costs[i] = steps
+
+            ann_state = self.__data_adapter.get_ann_state(lays[i])
+            x.append(ann_state)
+
+        return np.stack(x)
     
     def __update_cost(self, actions, costs:np.ndarray, lays:np.ndarray[Layout]) -> None:
         k = 0
