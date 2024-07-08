@@ -6,7 +6,7 @@ from setuptools import setup
 
 HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
-VERSION = "2.0"
+VERSION = "2.0.1"
 
 setup(
     name= "CPMP_ML",
