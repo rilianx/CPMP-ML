@@ -20,7 +20,6 @@ class GreedyModel(OptimizerStrategy):
             x = self.__get_valid_data(steps, costs, lays)
             if x.shape[0] == 0: break
             actions = self.__model.predict(x, verbose=False)
-            print(actions)
             self.__update_cost(actions, costs, lays)
 
         return costs
