@@ -6,5 +6,5 @@ from numpy import ndarray
 class OptimizerStrategy(ABC):
     
     @abstractmethod
-    def solve(self, lays: ndarray[Layout]):
+    def solve(self, lays: ndarray[Layout], **kwargs):
         pass

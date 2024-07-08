@@ -6,7 +6,7 @@ class GreedyV1(OptimizerStrategy):
     def __init__(self):
         pass
 
-    def solve(self, layouts: np.ndarray[Layout]):
+    def solve(self, layouts: np.ndarray[Layout], **kwargs):
         costs = -np.ones(len(layouts))
         for k in range(len(layouts)):
             steps = self.__greedy(layouts[k])

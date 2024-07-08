@@ -31,7 +31,7 @@ def generate_data_v3(
     y = []
     n = 0
 
-    while n < sample_size:
+    while True:
         lays = []
         for i in range(batch_size):
             lays.append(generate_random_layout(S=S, H=H, N=N))
@@ -70,7 +70,7 @@ def generate_data_v3(
                     A.append(0)
 
             if sum(A) > 0:  # otherwise no action was succesful, we simply discard the data
-                for k in range(perms_by_layout):
+                for _ in range(perms_by_layout):
                     enum_stacks = list(range(S))
                     perm = random.sample(enum_stacks, S)
                     lays_copy[p].permutate(perm)

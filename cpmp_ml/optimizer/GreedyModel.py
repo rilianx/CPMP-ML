@@ -7,18 +7,16 @@ import numpy as np
 class GreedyModel(OptimizerStrategy):
 
     def __init__(self, model:Model = None, 
-                 max_steps: int = None,
                  data_adapter: DataAdapter = None):
-        if model is None or max_steps is None or data_adapter is None:
+        if model is None is None or data_adapter is None:
             return ValueError("Some parameter was not given by argument.")
         self.__model = model
-        self.__max_steps = max_steps
         self.__data_adapter = data_adapter
 
-    def solve(self, lays: np.ndarray[Layout]):
+    def solve(self, lays: np.ndarray[Layout], **kwargs):
         costs = -np.ones(lays.shape[0])
-
-        for steps in range(self.__max_steps):
+        max_steps = kwargs["max_steps"]
+        for steps in range(max_steps):
             x = self.__get_valid_data(steps, costs, lays)
             if x.shape[0] == 0:break
             actions = self.__model.predict(x, verbose=False)[0]

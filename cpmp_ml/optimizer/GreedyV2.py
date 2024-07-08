@@ -7,7 +7,7 @@ class GreedyV2(OptimizerStrategy):
         self.__max_steps = max_steps
         self.__params = params
 
-    def solve(self, lays: np.ndarray[Layout]):
+    def solve(self, lays: np.ndarray[Layout], **kwargs):
         costs = -np.ones(lays.shape[0])
         for k in range(lays.shape[0]):
             steps = self.__greedy(lays[k])
