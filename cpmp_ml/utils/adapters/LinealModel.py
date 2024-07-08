@@ -2,6 +2,8 @@ from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import Layout
 import numpy as np
 
+# Deja último contenedor en el top del arreglo
+
 class LinealModel(DataAdapter):
     def __init__(self, S:int, H:int):
         self.__S = S
