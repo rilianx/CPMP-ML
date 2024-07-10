@@ -9,7 +9,7 @@ class GreedyModel(OptimizerStrategy):
     def __init__(self, model:Model = None, 
                  data_adapter: DataAdapter = None):
         if model is None is None or data_adapter is None:
-            return ValueError("Some parameter was not given by argument.")
+            raise ValueError("Some parameter was not given by argument.")
         self.__model = model
         self.__data_adapter = data_adapter
 
