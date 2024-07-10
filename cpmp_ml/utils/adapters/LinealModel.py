@@ -5,8 +5,7 @@ import numpy as np
 # Deja último contenedor en el top del arreglo
 
 class LinealModel(DataAdapter):
-    def __init__(self, S:int, H:int):
-        self.__S = S
+    def __init__(self, H:int):
         self.__H = H
 
     def get_ann_state(self, lay: Layout) -> np.ndarray:
@@ -36,14 +35,24 @@ class LinealModel(DataAdapter):
 
         return b
     
-    def get_move(self, act:int) -> tuple:
+    def get_move(self, act: int, S: int) -> tuple:
         k=0
-        for i in range(self.__S):
+        for i in range(S):
             for j in range(self.__H):
                 if i==j: continue
                 if k==act: return (i,j)
                 k+=1
     
     def get_layout_from_ann_state(self, ann_state: np.ndarray[np.ndarray], S: int, H: int, N: int) -> Layout:
-        return 
+        
+        stacks = []
+        index = 0
+        for i in range(0, len(ann_state), self.__H + 1):
+            if index == S: break
+            section = ann_state[i:i+H+1]
+            stack = [int(section[k] * N) for k in range(1, H + 1) if section[k] != 2.]
+            stacks.append(stack)
+            index += 1
+
+        return Layout(stacks=stacks, H=H)
     
