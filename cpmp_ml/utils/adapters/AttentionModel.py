@@ -23,15 +23,9 @@ class AttentionModel(DataAdapter):
         return (None, None)
 
     def get_layout_from_ann_state(self, ann_state: np.ndarray[np.ndarray], S: int, H: int, N: int) -> Layout:
-        elements = 0
-        for i in range(ann_state.shape[0]):
-            for k in range(1, ann_state.shape[1]):
-                if ann_state[i][k] != 2:
-                    elements+=1
-
         stacks = []
-        for i in range(ann_state.shape[0]):
-            stack = [int(ann_state[i][k] * elements) for k in range(1, ann_state.shape[1]) if ann_state[i][k] != 2]
+        for i in range(S):
+            stack = [int(ann_state[i][k] * N) for k in range(1, ann_state.shape[1]) if ann_state[i][k] != 2.]
             stacks.append(stack)
 
         return Layout(stacks=stacks, H=H)
