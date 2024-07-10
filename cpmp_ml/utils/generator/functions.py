@@ -67,7 +67,7 @@ def permutate_y(y: np.ndarray, S: int, perm: list):
 
     return A
 
-def random_perturbate_layout(lay:Layout, moves:int = 5) -> None | ValueError:
+def random_perturbate_layout(lay:Layout, moves:int = 5) -> None:
     if lay is None:
         raise ValueError("Lay is None")
 
