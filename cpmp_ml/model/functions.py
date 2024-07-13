@@ -30,7 +30,7 @@ def create_cpmp_model(generate_model, S: int, H: int) -> Model:
         )
     return Fmodel
 
-def generate_model2(S: int, H: int):
+def generate_model2(S: int, H: int) -> Model:
     x = Input(shape=(S*(H+1)+2*(S*(S-1)),)) #recibe el estado + tipo de movs
 
     sensors = []
@@ -68,7 +68,7 @@ def generate_model2(S: int, H: int):
 
     return model
 
-def generate_model(S: int, H: int):
+def generate_model(S: int, H: int) -> Model:
     model = tf.keras.Sequential()
 
     model.add(layers.Dense(256, activation='relu',
