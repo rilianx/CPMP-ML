@@ -1,2 +1,3 @@
 from cpmp_ml.validations.metrics import validate_model
 from cpmp_ml.validations.metrics import cosine_Similarity
+from cpmp_ml.validations.graphics import percentage_per_container
