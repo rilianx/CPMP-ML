@@ -7,8 +7,9 @@ class GreedyV1(OptimizerStrategy):
         costs = -np.ones(len(layouts))
         lays_moves = []
         for k in range(len(layouts)):
-            steps = self.__greedy(layouts[k])
+            steps, moves = self.__greedy(layouts[k])
             costs[k]=steps
+            lays_moves.append(moves)
         return costs, lays_moves
     
     def __greedy(self, layout: Layout):
