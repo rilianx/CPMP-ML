@@ -13,21 +13,21 @@ def generate_steps_state(lay: Layout, N: int,
     cont = 0
     temp_lay = deepcopy(lay)
 
-    p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps)
-    if p_cost == -1 and moves is None: return None, None
+    p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps= max_steps)
+    if p_cost[0] == -1 and moves[0] is None: return None, None
 
-    lays, labels = np.empty(shape=(p_cost, )), np.empty(shape=(p_cost, ))
+    lays, labels = [], []
     while lay.unsorted_stacks != 0:
         temp_lay = deepcopy(lay)
-        y_ = generate_y(temp_lay, p_cost, optimizer, max_steps)
+        y_ = generate_y(temp_lay, p_cost[0], optimizer, max_steps= max_steps)
 
         if y_ is None: return None, None
-        labels[cont] = y_
-        lays[cont] = adapter.get_ann_state(temp_lay)
+        labels.append(y_)
+        lays.append(adapter.get_ann_state(temp_lay))
 
-        lay.move(moves[cont])
+        lay.move(moves[0][cont])
         cont += 1
-        p_cost -= 1
+        p_cost[0] -= 1
 
     return lays, labels
 
@@ -37,7 +37,7 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
                      space_between: float, optimizer: OptimizerStrategy,
                      adapter: DataAdapter, verbose: bool = True
                      ) -> dict:
-    x, y = np.empty(shape=(size,)), np.empty(shape=(size,))
+    x, y = np.empty(shape=(size,), dtype= object), np.empty(shape=(size,), dtype= object)
     space = 0
     cont = 0
 
@@ -50,15 +50,15 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
 
         if lays is None and labels is None: continue
 
-        lb_size = int(lays.shape[0] * lb)
-        ub_size = int(lays.shape[0] * ub)
+        lb_size = int(len(lays) * lb)
+        ub_size = int(len(lays) * ub)
         space += space_between 
 
         data = zip(lays[lb_size: ub_size: int(space)], labels[lb_size: ub_size: int(space)])
 
         for layout, label in data:
             if cont == size: break
-            if verbose: print(f'sample_size: {cont}')
+            if verbose and cont % 100 == 0: print(f'sample_size: {cont}')
 
             x[cont], y[cont] = layout, label
             cont += 1

@@ -53,8 +53,8 @@ def generate_data_v1(S: int = -1,
 
         # Analizar el coste
         copy_lay = deepcopy(lay)
-        p_cost = solver.solve(np.array([copy_lay]), **kwargs)[0]
-        y_ = generate_y(layout=copy_lay, p_cost=p_cost, optimizer= solver, **kwargs)
+        p_cost, lays_moves = solver.solve(np.array([copy_lay]), **kwargs)
+        y_ = generate_y(layout=copy_lay, p_cost=p_cost[0], optimizer= solver, **kwargs)
 
         if y_ is None: continue
 

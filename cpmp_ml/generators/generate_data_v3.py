@@ -37,7 +37,7 @@ def generate_data_v3(
             lays.append(generate_random_layout(S=S, H=H, N=N))
 
         lays_copy = deepcopy(lays)
-        costs = solver.solve(np.array(lays), **kwargs)
+        costs, moves = solver.solve(np.array(lays), **kwargs)
 
         # for each lay we generate children clays
         child_lays = []
@@ -49,7 +49,7 @@ def generate_data_v3(
                     child_lay.move((i, j))
                     child_lays.append(child_lay)
 
-        child_costs = solver.solve(np.array(child_lays), **kwargs)
+        child_costs, child_moves = solver.solve(np.array(child_lays), **kwargs)
 
         # for each parent to verify the existence of solutions
         for p in range(batch_size):
