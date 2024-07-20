@@ -22,13 +22,13 @@ class GreedyModel(OptimizerStrategy):
             x = self.__get_valid_data(steps, costs, lays)
             if x.shape[0] == 0: break
             actions = self.__model.predict(x, verbose=False)
-            self.__update_cost(actions, costs, lays)
+            self.__update_cost(actions, costs, lays, lays_moves)
 
         self.__verify_solutions__(lays, lays_moves)
 
         return costs, lays_moves
     
-    def __verify_solutions__(self, lays:np.ndarray[Layout], lays_moves: list[list]):
+    def __verify_solutions__(self, lays:np.ndarray[Layout], lays_moves: list[list]) -> None:
         for i in range(lays.shape[0]):
             if lays[i].unsorted_stacks != 0: lays_moves[i] = None
 
