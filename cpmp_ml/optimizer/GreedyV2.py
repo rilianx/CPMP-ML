@@ -6,17 +6,20 @@ class GreedyV2(OptimizerStrategy):
     def __init__(self, params:list = [2.0, 2.0, 4, 2.1, 2]):
         self.__params = params
 
-    def solve(self, lays: np.ndarray[Layout], **kwargs):
+    def solve(self, lays: np.ndarray[Layout], **kwargs) -> tuple:
         self.__max_steps = kwargs["max_steps"]
 
         costs = -np.ones(lays.shape[0])
+        lays_moves = []
         for k in range(lays.shape[0]):
-            steps = self.__greedy(lays[k])
+            steps, moves = self.__greedy(lays[k])
             costs[k]=steps
-        return costs
+            lays_moves.append(moves)
+        return costs, lays_moves
 
     def __greedy(self, lay:Layout) -> int:
         steps = 0
+        moves = []
         while lay.unsorted_stacks > 0 and steps < self.__max_steps:
             actions = lay.get_actions()
 
@@ -29,13 +32,14 @@ class GreedyV2(OptimizerStrategy):
 
             if best_action is not None:
                 lay.move(best_action)
+                moves.append(best_action)
             else:
-                return -1
+                return -1, None
             steps +=1
 
         if lay.unsorted_stacks==0:
-            return steps
-        return -1
+            return steps, moves
+        return -1, None
     
     def __eval_action(self, lay:Layout, action:tuple, params:list):
         s_o, s_d = action

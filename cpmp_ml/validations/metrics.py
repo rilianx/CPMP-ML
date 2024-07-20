@@ -15,8 +15,8 @@ def validate_model(model: Model, optimizer: OptimizerStrategy, data_adapter: Dat
         lays = [generate_random_layout(S, H, N) for _ in range(size_states)]
 
     lays1 = deepcopy(lays)
-    costs1 = optimizer_model.solve(np.array(lays1), **kwargs)
-    costs2 = optimizer.solve(np.array(lays), **kwargs)
+    costs1 = optimizer_model.solve(np.array(lays1), **kwargs)[0]
+    costs2 = optimizer.solve(np.array(lays), **kwargs)[0]
 
     valid_costs1 = [v for v in costs1 if v!=-1]
     valid_costs2 = [v for v in costs2 if v!=-1]
