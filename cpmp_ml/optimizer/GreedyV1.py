@@ -3,26 +3,29 @@ from cpmp_ml.utils import Layout
 import numpy as np
 
 class GreedyV1(OptimizerStrategy):
-    def solve(self, layouts: np.ndarray[Layout], **kwargs):
+    def solve(self, layouts: np.ndarray[Layout], **kwargs) -> tuple:
         costs = -np.ones(len(layouts))
+        lays_moves = []
         for k in range(len(layouts)):
             steps = self.__greedy(layouts[k])
             costs[k]=steps
-        return costs
+        return costs, lays_moves
     
     def __greedy(self, layout: Layout):
         steps = 0
+        moves = []
         while layout.unsorted_stacks>0:
             bg_move=self.__select_bg_move(layout)
             if bg_move is not None:
                 layout.move(bg_move)
+                moves.append(bg_move)
             else:
-                return -1 # no lo resuelve
+                return -1, None # no lo resuelve
             steps +=1
 
         if layout.unsorted_stacks==0: 
-            return steps
-        return -1
+            return steps, moves
+        return -1, None
     
     def __select_bg_move(self, layout:Layout):
         bg_move = None
