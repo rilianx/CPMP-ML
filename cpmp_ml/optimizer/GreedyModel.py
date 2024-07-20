@@ -16,7 +16,7 @@ class GreedyModel(OptimizerStrategy):
     def solve(self, lays: np.ndarray[Layout], **kwargs) -> tuple:
         costs = -np.ones(lays.shape[0])
         max_steps = kwargs["max_steps"]
-        lays_moves = [[] for _ in lays.shape[0]]
+        lays_moves = [[] for _ in range(lays.shape[0])]
 
         for steps in range(max_steps):
             x = self.__get_valid_data(steps, costs, lays)
