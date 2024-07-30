@@ -52,9 +52,12 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
 
         lb_size = int(len(lays) * lb)
         ub_size = int(len(lays) * ub)
-        space += space_between 
 
-        data = zip(lays[lb_size: ub_size: int(space)], labels[lb_size: ub_size: int(space)])
+        data = []
+        space = lb_size
+        while space < ub_size:
+            data.append((lays[space], labels[space]))
+            space += space_between
 
         for layout, label in data:
             if cont == size: break
