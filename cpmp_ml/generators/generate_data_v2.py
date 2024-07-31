@@ -56,7 +56,7 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
         data = []
         space = lb_size
         while space < ub_size:
-            data.append((lays[space], labels[space]))
+            data.append((lays[int(space)], labels[int(space)]))
             space += space_between
 
         for layout, label in data:
