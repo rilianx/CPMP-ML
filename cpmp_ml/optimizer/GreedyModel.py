@@ -35,8 +35,9 @@ class GreedyModel(OptimizerStrategy):
     def __get_valid_data(self, steps:int, costs:np.ndarray, lays:np.ndarray[Layout]) -> np.ndarray:
         x = []
         for i in range(lays.shape[0]):
-            if lays[i].unsorted_stacks == 0 and costs[i] == -1: 
-                costs[i] = steps
+            if lays[i].unsorted_stacks == 0:
+                if costs[i] == -1: costs[i] = steps
+                continue
 
             ann_state = self.__data_adapter.get_ann_state(lays[i])
             x.append(ann_state)
