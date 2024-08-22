@@ -6,19 +6,20 @@ import random
 
 def costs_to_y(costs: np.ndarray, parent_cost: int) -> None | np.ndarray:
     mincost = np.inf
-    y = np.zeros(costs.shape[0])
+    y = []
 
-    filtered_costs = [c for c in costs if c != -1]
-    mincost = min(filtered_costs) if filtered_costs else None
-
-    if mincost is None or mincost >= parent_cost: return None
-
-    pos = 0
+    for c in costs:
+        if c != 1 and c < mincost:
+            mincost = c
+    
+    if c != 1 and mincost >= parent_cost:
+        return None
+    
     for c in costs:
         if c == mincost:
-            y[pos] = 1
-        
-        pos += 1
+            y.append(1)
+        else:
+            y.append(0)
 
     return y
 
