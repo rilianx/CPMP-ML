@@ -7,7 +7,7 @@ from copy import deepcopy
 import numpy as np
 import random
 
-def generate_steps_state(lay: Layout, N: int, 
+def generate_steps_state(lay: Layout,
                          optimizer: OptimizerStrategy, adapter: DataAdapter,
                          max_steps: int) -> tuple:
     cont = 0
@@ -23,7 +23,7 @@ def generate_steps_state(lay: Layout, N: int,
 
         if y_ is None: return None, None
         labels.append(y_)
-        lays.append(adapter.get_ann_state(temp_lay))
+        lays.append(adapter.get_ann_state(lay))
 
         lay.move(moves[0][cont])
         cont += 1
@@ -33,40 +33,30 @@ def generate_steps_state(lay: Layout, N: int,
 
 # Generación de datos con los optimizadores greedy enviando los pasos intermedios
 def generate_data_v2(min_S: int, max_S: int, H: int, 
-                     size: int, lb: float, ub: float, 
-                     space_between: float, optimizer: OptimizerStrategy,
+                     size: int, ub: float, 
+                     optimizer: OptimizerStrategy,
                      adapter: DataAdapter, verbose: bool = True
                      ) -> dict:
-    x, y = np.empty(shape=(size,), dtype= object), np.empty(shape=(size,), dtype= object)
-    space = 0
-    cont = 0
+    x, y = [], []
 
     while True:
         S = random.randint(min_S, max_S)
         N = S * (H - 2)
 
         lay = generate_random_layout(S, H, N)
-        lays, labels = generate_steps_state(lay, N, optimizer, adapter, max_steps= N * 2)
+        lays, labels = generate_steps_state(lay, optimizer, adapter, max_steps= N * 2)
 
         if lays is None and labels is None: continue
 
-        lb_size = int(len(lays) * lb)
         ub_size = int(len(lays) * ub)
 
-        data = []
-        space = lb_size
-        while space < ub_size:
-            data.append((lays[int(space)], labels[int(space)]))
-            space += space_between
-
-        for layout, label in data:
-            if cont == size: break
-            if verbose and cont % 100 == 0: print(f'sample_size: {cont}')
-
-            x[cont], y[cont] = layout, label
-            cont += 1
-        
-        if cont == size: break
+        data = zip(lays[:ub_size], labels[:ub_size])
+        for state, label in data:
+            if len(x) == size: return x, y
+            if verbose and len(x) % 100 == 0: print(len(x))
+            
+            x.append(state)
+            y.append(label)
 
     return x, y
 
