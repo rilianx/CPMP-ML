@@ -36,6 +36,7 @@ def generate_y(layout: Layout, p_cost: int, optimizer: OptimizerStrategy, **kwar
 
             temp_lay.move((i, j))
             costs[pos] = optimizer.solve(np.array([temp_lay]), **kwargs)[0]
+            temp_lay = deepcopy(layout)
             pos += 1
 
     return costs_to_y(costs, p_cost)
