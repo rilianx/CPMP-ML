@@ -23,7 +23,7 @@ def generate_steps_state(lay: Layout,
 
         if y_ is None and len(lays) == 0: return None, None
         elif y_ is None and len(lays) != 0: return lays, labels
-        
+
         labels.append(y_)
         lays.append(adapter.get_ann_state(lay))
 
@@ -35,7 +35,7 @@ def generate_steps_state(lay: Layout,
 
 # Generación de datos con los optimizadores greedy enviando los pasos intermedios
 def generate_data_v2(min_S: int, max_S: int, H: int, 
-                     size: int, ub: float, 
+                     size: int, lb: float, 
                      optimizer: OptimizerStrategy,
                      adapter: DataAdapter, verbose: bool = True
                      ) -> dict:
@@ -50,9 +50,9 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
 
         if lays is None and labels is None: continue
 
-        ub_size = int(len(lays) * ub)
+        lb_size = int(len(lays) * lb)
 
-        data = zip(lays[:ub_size], labels[:ub_size])
+        data = zip(lays[lb_size:], labels[lb_size:])
         for state, label in data:
             if len(x) == size: return x, y
             if verbose and len(x) % 100 == 0: print(len(x))
