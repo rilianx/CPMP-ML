@@ -14,14 +14,13 @@ def generate_steps_state(lay: Layout,
     temp_lay = deepcopy(lay)
 
     p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps= max_steps)
-    if p_cost[0] == -1 and moves[0] is None: return None, None
+    if p_cost[0] == -1: return None, None
 
     lays, labels = [], []
     while lay.unsorted_stacks != 0:
         temp_lay = deepcopy(lay)
         y_ = generate_y(temp_lay, p_cost[0], optimizer, max_steps= max_steps)
-
-        if y_ is None or len(lays) == 0: return None, None
+        if y_ is None and len(lays) == 0: return None, None
 
         labels.append(y_)
         lays.append(adapter.get_ann_state(lay))
