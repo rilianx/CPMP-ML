@@ -22,7 +22,6 @@ def generate_steps_state(lay: Layout,
         y_ = generate_y(temp_lay, p_cost[0], optimizer, max_steps= max_steps)
 
         if y_ is None and len(lays) == 0: return None, None
-        elif y_ is None and len(lays) != 0: return lays, labels
 
         labels.append(y_)
         lays.append(adapter.get_ann_state(lay))
