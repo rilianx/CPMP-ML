@@ -47,7 +47,7 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
         lay = generate_random_layout(S, H, N)
         lays, labels = generate_steps_state(lay, optimizer, adapter, max_steps= N * 2)
 
-        if lays is None and labels is None: continue
+        if lays is None or labels is None: continue
 
         lb_size = int(len(lays) * lb)
 
