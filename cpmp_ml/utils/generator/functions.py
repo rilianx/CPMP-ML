@@ -9,10 +9,10 @@ def costs_to_y(costs: np.ndarray, parent_cost: int) -> None | np.ndarray:
     y = []
 
     for c in costs:
-        if c != 1 and c < mincost:
+        if c != -1 and c < mincost:
             mincost = c
-    
-    if c != 1 and mincost >= parent_cost:
+
+    if c != -1 and mincost >= parent_cost:
         return None
     
     for c in costs:
@@ -38,7 +38,7 @@ def generate_y(layout: Layout, p_cost: int, optimizer: OptimizerStrategy, **kwar
             costs[pos] = optimizer.solve(np.array([temp_lay]), **kwargs)[0][0]
             temp_lay = deepcopy(layout)
             pos += 1
-    
+
     return costs_to_y(costs, p_cost)
 
 def gen_movement_matrix(y: np.ndarray, S: int) -> np.ndarray:
