@@ -50,7 +50,7 @@ def generate_data_v2(min_S: int, max_S: int, H: int,
 
         lb_size = int(len(lays) * lb)
 
-        data = zip(lays[lb_size:], labels[lb_size:])
+        data = zip(lays[:lb_size], labels[:lb_size])
         for state, label in data:
             if len(x) == size: return x, y
             if verbose and len(x) % 100 == 0: print(len(x))
