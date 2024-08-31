@@ -3,13 +3,14 @@ from cpmp_ml.utils.generator import generate_y
 from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import generate_random_layout
 from cpmp_ml.utils import Layout
+from multiprocessing import Pool
 from copy import deepcopy
 import numpy as np
 import random
 
 def generate_steps_state(lay: Layout,
                          optimizer: OptimizerStrategy, adapter: DataAdapter,
-                         max_steps: int) -> tuple:
+                         max_steps: int, lb: float) -> tuple:
     cont = 0
     temp_lay = deepcopy(lay)
 
@@ -29,34 +30,38 @@ def generate_steps_state(lay: Layout,
         cont += 1
         p_cost[0] -= 1
 
-    return lays, labels
+    lb_size = int(len(lays) * lb)
 
-# Generación de datos con los optimizadores greedy enviando los pasos intermedios
-def generate_data_v2(min_S: int, max_S: int, H: int, 
-                     size: int, lb: float, 
-                     optimizer: OptimizerStrategy,
-                     adapter: DataAdapter, verbose: bool = True
-                     ) -> dict:
+    return lays[lb_size:], labels[lb_size:]
+
+def process_data(x):
+    return generate_steps_state(x[0], x[1], x[2], x[3], x[4])
+
+def generate_data_v2(min_S: int, max_S: int, 
+                     H: int, size: int, lb: int, 
+                     optimizer: OptimizerStrategy, 
+                     adapter: DataAdapter, 
+                     batch_size: int = 32,
+                     verbose: bool = True) -> tuple:
     x, y = [], []
 
     while True:
-        S = random.randint(min_S, max_S)
-        N = S * (H - 2)
+        r_stacks = [random.randint(min_S, max_S) for _ in range(batch_size)]
+        batch = [(generate_random_layout(r_stacks[i], H, r_stacks[i] * (H - 2)), optimizer, 
+                  adapter, (r_stacks[i] * (H - 2)) * 2, lb) for i in range(batch_size)]
 
-        lay = generate_random_layout(S, H, N)
-        lays, labels = generate_steps_state(lay, optimizer, adapter, max_steps= N * 2)
+        with Pool() as pool:
+            result = pool.map(process_data, batch)
 
-        if lays is None or labels is None: continue
+        print(result)
+        for i in range(len(result)):
+            if result[i][0] is None and result[i][1] is None: continue
 
-        lb_size = int(len(lays) * lb)
+            for j in range(len(result[i][0])):
+                if len(x) == size: return x, y
+                if len(x) % 100 == 0 and verbose: print(len(x))
+        
+                x.append(result[i][0][j])
+                y.append(result[i][1][j])
 
-        data = zip(lays[lb_size:], labels[lb_size:])
-        for state, label in data:
-            if len(x) == size: return x, y
-            if verbose and len(x) % 100 == 0: print(len(x))
-            
-            x.append(state)
-            y.append(label)
-
-    return x, y
 
