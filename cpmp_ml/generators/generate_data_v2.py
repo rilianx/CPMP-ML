@@ -53,7 +53,6 @@ def generate_data_v2(min_S: int, max_S: int,
         with Pool() as pool:
             result = pool.map(process_data, batch)
 
-        print(result)
         for i in range(len(result)):
             if result[i][0] is None and result[i][1] is None: continue
 
