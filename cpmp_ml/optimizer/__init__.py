@@ -10,7 +10,7 @@ _importables = {
 def __getattr__(name):
     """Carga los objetos bajo demanda."""
     if name in _importables:
-        modulo = __import__(f".{_importables[name]}", globals(), locals(), [name])
+        modulo = __import__(f"{_importables[name]}", globals(), locals(), [name])
         return getattr(modulo, name)
     raise AttributeError(f"module {__name__} has no attribute {name}")
 
