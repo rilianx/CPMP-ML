@@ -1,10 +1,10 @@
 __all__ = ["OptimizerStrategy", "GreedyV1", "GreedyV2", "GreedyModel"]
 
 _importables = {
-    "OptimizerStrategy": "cpmp_ml.optimizer.OptimizerStrategy",
-    "GreedyV1": "cpmp_ml.optimizer.GreedyV1",
-    "GreedyV2": "cpmp_ml.optimizer.GreedyModel",
-    "GreedyModel": "cpmp_ml.optimizer.GreedyModel"
+    "OptimizerStrategy": "cpmp_ml.optimizer",
+    "GreedyV1": "cpmp_ml.optimizer",
+    "GreedyV2": "cpmp_ml.optimizer",
+    "GreedyModel": "cpmp_ml.optimizer"
 }
 
 def __getattr__(name):
