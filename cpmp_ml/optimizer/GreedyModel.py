@@ -1,4 +1,4 @@
-from cpmp_ml.optimizer import OptimizerStrategy
+from cpmp_ml.optimizer.OptimizerStrategy import OptimizerStrategy
 from cpmp_ml.utils import Layout
 from cpmp_ml.utils.adapters import DataAdapter
 from keras.models import Model

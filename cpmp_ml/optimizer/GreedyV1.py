@@ -1,4 +1,4 @@
-from cpmp_ml.optimizer import OptimizerStrategy
+from cpmp_ml.optimizer.OptimizerStrategy import OptimizerStrategy
 from cpmp_ml.utils import Layout
 import numpy as np
 
