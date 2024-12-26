@@ -42,7 +42,7 @@ class GreedyModel(OptimizerStrategy):
             ann_state = self.__data_adapter.get_ann_state(lays[i])
             x.append(ann_state)
 
-        return np.stack(x)
+        return np.array(x)
     
     def __update_cost(self, actions, costs:np.ndarray, lays:np.ndarray[Layout], lays_move: list[list]) -> None:
         k = 0
