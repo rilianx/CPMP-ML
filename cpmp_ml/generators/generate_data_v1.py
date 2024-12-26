@@ -73,7 +73,7 @@ def generate_data_v1(S: int = -1,
 
                 n = n + 1
                 if verbose:     
-                    load_simbol(n, sample_size)
+                    load_simbol(n, sample_size, text="Datos generados:")
                     if n < sample_size: delete_terminal_lines(1)
 
                 if len(x) == sample_size: break

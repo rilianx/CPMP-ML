@@ -75,7 +75,7 @@ def generate_data_v2(min_S: int,
 
                 for j in range(len(result[i][0])):
                     if verbose: 
-                        load_simbol(len(x), size)
+                        load_simbol(len(x), size, text="Datos generados:")
                         if len(x) < size: delete_terminal_lines(1)
 
                     if len(x) == size: return x, y

@@ -84,7 +84,7 @@ def generate_data_v3(
                         y.append(deepcopy(A))
 
                         if verbose: 
-                            load_simbol(len(x), sample_size)
+                            load_simbol(len(x), sample_size, text="Datos generados:")
                             if len(x) < sample_size: delete_terminal_lines(1)
 
                         if len(x) == sample_size: return np.array(x), np.array(y)
