@@ -2,6 +2,7 @@ from cpmp_ml.optimizer import OptimizerStrategy
 from cpmp_ml.utils import Layout
 from cpmp_ml.utils.adapters import DataAdapter
 from keras.api.models import Model
+from keras.api import backend as K
 import numpy as np
 
 class GreedyModel(OptimizerStrategy):
@@ -22,6 +23,7 @@ class GreedyModel(OptimizerStrategy):
             x = self.__get_valid_data(steps, costs, lays)
             if x.shape[0] == 0: break
             actions = self.__model.predict(x, verbose=False)
+            K.clear_session()
             self.__update_cost(actions, costs, lays, lays_moves)
 
         self.__verify_solutions__(lays, lays_moves)
