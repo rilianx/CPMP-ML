@@ -15,26 +15,34 @@ def generate_steps_state(lay: Layout,
                          adapter: DataAdapter,
                          max_steps: int, 
                          lb: float) -> tuple:
-    cont = 0
-    temp_lay = deepcopy(lay)
-
-    p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps= max_steps)
-    if p_cost[0] == -1: return None, None
-
-    lays, labels = [], []
-    while lay.unsorted_stacks != 0:
+    try:
+        cont = 0
         temp_lay = deepcopy(lay)
-        y_ = generate_y(temp_lay, p_cost[0], optimizer, max_steps= max_steps)
-        if y_ is None: return None, None
 
-        labels.append(y_)
-        lays.append(adapter.get_ann_state(lay))
+        p_cost, moves = optimizer.solve(np.array([temp_lay]), max_steps= max_steps)
+        if p_cost[0] == -1: return None, None
 
-        lay.move(moves[0][cont])
-        cont += 1
-        p_cost[0] -= 1
+        lays, labels = [], []
+        while lay.unsorted_stacks != 0:
+            temp_lay = deepcopy(lay)
+            y_ = generate_y(temp_lay, p_cost[0], optimizer, max_steps= max_steps)
+            if y_ is None: return None, None
 
-    lb_size = int(len(lays) * lb)
+            labels.append(y_)
+            lays.append(adapter.get_ann_state(lay))
+
+            lay.move(moves[0][cont])
+            cont += 1
+            p_cost[0] -= 1
+
+        lb_size = int(len(lays) * lb)
+    except Exception as e:
+        print(f"Error al generar datos!")
+        return None, None
+    except KeyboardInterrupt:
+        print(f"Generación de datos interrumpida!")
+        return None, None
+
 
     return lays[lb_size:], labels[lb_size:]
 
@@ -58,13 +66,9 @@ def generate_data_v2(min_S: int,
             r_stacks = [random.randint(min_S, max_S) for _ in range(batch_size)]
             batch = [(generate_random_layout(r_stacks[i], H, r_stacks[i] * (H - 2)), optimizer, 
                     adapter, (r_stacks[i] * (H - 2)) * 2, lb) for i in range(batch_size)]
-
-            try:
-                with Pool(processes= num_threads) as pool:
-                    result = pool.map(process_data, batch)
-            except Exception as e:
-                print('Error al generar datos por sobrecarga de CPU!')
-                return x, y
+           
+            with Pool(processes= num_threads) as pool:
+                result = pool.map(process_data, batch)  
 
             for i in range(len(result)):
                 if result[i][0] is None and result[i][1] is None: continue
