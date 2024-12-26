@@ -22,6 +22,7 @@ def generate_data_v1(S: int = -1,
                      from_feasible: bool = False, 
                      perms_by_layout: int = -1,
                      moves: int = 5,
+                     batch_size: int = 32,
                      solver: OptimizerStrategy = None,
                      adapter: DataAdapter = None, 
                      **kwargs) -> tuple:
@@ -47,37 +48,39 @@ def generate_data_v1(S: int = -1,
 
     try:
         while True:
-            if len(x) == sample_size: break
-
             # Generar el layout random
-            lay = generate_random_layout(S, H, N, feasible=from_feasible)
+            lays = [generate_random_layout(S, H, N, feasible=from_feasible) for _ in range(batch_size)]
 
             # Generar perturbación de ser necesario
-            if from_feasible: random_perturbate_layout(lay, moves=moves)
+            if from_feasible: random_perturbate_layout(lays, moves=moves)
 
             # Analizar el coste
-            copy_lay = deepcopy(lay)
-            p_cost, lays_moves = solver.solve(np.array([copy_lay]), **kwargs)
-            y_ = generate_y(layout=copy_lay, p_cost=p_cost[0], optimizer= solver, **kwargs)
+            copy_lays = deepcopy(lays)
+            p_cost, lays_moves = solver.solve(np.array(copy_lays), **kwargs)
 
-            if y_ is None: continue
+            labels = []
+            for i in range(len(p_cost)):
+                y_ = generate_y(layout=copy_lays, p_cost=p_cost[i], optimizer= solver, **kwargs)
+                
+                labels.append(y_)
 
-            for k in range(perms_by_layout):
-                enum_stacks = list(range(S))
-                perm = random.sample(enum_stacks, S)
-                copy_lay.permutate(perm)
-                y_ = permutate_y(y_, S, perm)
+            for i in range(len(labels)):
+                for _ in range(perms_by_layout):
+                    enum_stacks = list(range(S))
+                    perm = random.sample(enum_stacks, S)
+                    copy_lays.permutate(perm)
+                    y_ = permutate_y(labels[i], S, perm)
 
-                x.append(adapter.get_ann_state(copy_lay))
-                y.append(deepcopy(y_))
+                    x.append(adapter.get_ann_state(copy_lays))
+                    y.append(deepcopy(y_))
 
-                n = n + 1
-                if verbose:     
-                    load_simbol(n, sample_size, text="Datos generados:")
-                    if n < sample_size: delete_terminal_lines(1)
+                    n = n + 1
+                    if verbose:     
+                        load_simbol(n, sample_size, text="Datos generados:")
+                        if n < sample_size: delete_terminal_lines(1)
 
-                if len(x) == sample_size: break
-                if n >= sample_size: break
+                    if len(x) == sample_size: break
+                    if n >= sample_size: break
     except Exception as e:
         print(f"Error al generar datos!")
         return np.array(x), np.array(y)
