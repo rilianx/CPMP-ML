@@ -1,6 +1,6 @@
-from keras import layers, Input, Sequential, Model, optimizers
-from keras.losses import BinaryCrossentropy
-from keras.models import Model
+from keras.api import layers, Input, Sequential, optimizers
+from keras.api.losses import BinaryCrossentropy
+from keras.api.models import Model
 import tensorflow as tf
 
 def load_cpmp_model(generate_model, model_file: str, S: int, H: int, ) -> Model:

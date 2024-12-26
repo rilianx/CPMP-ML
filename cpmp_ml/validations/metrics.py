@@ -1,4 +1,4 @@
-from keras.models import Model
+from keras.api.models import Model
 from cpmp_ml.optimizer import OptimizerStrategy
 from cpmp_ml.optimizer import GreedyModel
 from cpmp_ml.utils.adapters import DataAdapter
