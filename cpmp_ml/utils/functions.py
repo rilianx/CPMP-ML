@@ -1,5 +1,11 @@
 from cpmp_ml.utils import Layout
 import random
+import sys
+
+def delete_terminal_lines(lines: int):
+    for _ in range(lines):
+        sys.stdout.write("\033[F")
+        sys.stdout.write("\033[K")
 
 def read_benchmark_file(route: str, H: int) -> Layout:
     with open(route) as file:
