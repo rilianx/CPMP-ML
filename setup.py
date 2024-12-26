@@ -18,9 +18,9 @@ setup(
     author= "Rilianx Team",
     install_requires= [
         "numpy",
-        "tensorflow"
+        "tensorflow==2.18.0"
     ],
-    python_requires= ">=3.10",
+    python_requires= ">=3.11.9",
     packages= find_packages(
         include=("cpmp_ml", "cpmp_ml.*"),
         exclude=["views", "views.*", "gui", "gui.*"]
