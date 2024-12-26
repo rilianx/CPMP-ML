@@ -1,7 +1,9 @@
 from cpmp_ml.optimizer import OptimizerStrategy
+from cpmp_ml.utils.generator import permutate_y
+from cpmp_ml.utils.generator import load_simbol
 from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import generate_random_layout
-from cpmp_ml.utils.generator import permutate_y
+from cpmp_ml.utils import delete_terminal_lines
 from copy import deepcopy
 import numpy as np
 import random
@@ -16,6 +18,7 @@ def generate_data_v3(
         sample_size: int = 0,
         batch_size: int = 0,
         perms_by_layout: int = 20,
+        verbose: bool = True,
         **kwargs
     ) -> tuple:
 
@@ -31,51 +34,66 @@ def generate_data_v3(
     y = []
     n = 0
 
-    while True:
-        lays = []
-        for i in range(batch_size):
-            lays.append(generate_random_layout(S=S, H=H, N=N))
+    try:
+        while True:
+            lays = []
+            for i in range(batch_size):
+                lays.append(generate_random_layout(S=S, H=H, N=N))
 
-        lays_copy = deepcopy(lays)
-        costs, moves = solver.solve(np.array(lays), **kwargs)
+            lays_copy = deepcopy(lays)
+            costs, moves = solver.solve(np.array(lays), **kwargs)
 
-        # for each lay we generate children clays
-        child_lays = []
-        for p in range(batch_size):
-            for i in range(S):
-                for j in range(S):
-                    if i == j: continue
-                    child_lay = deepcopy(lays_copy[p])
-                    child_lay.move((i, j))
-                    child_lays.append(child_lay)
+            # for each lay we generate children clays
+            child_lays = []
+            for p in range(batch_size):
+                for i in range(S):
+                    for j in range(S):
+                        if i == j: continue
+                        child_lay = deepcopy(lays_copy[p])
+                        child_lay.move((i, j))
+                        child_lays.append(child_lay)
 
-        child_costs, child_moves = solver.solve(np.array(child_lays), **kwargs)
+            child_costs, child_moves = solver.solve(np.array(child_lays), **kwargs)
 
-        # for each parent to verify the existence of solutions
-        for p in range(batch_size):
-            mincost = np.inf
+            # for each parent to verify the existence of solutions
+            for p in range(batch_size):
+                mincost = np.inf
 
-            # Get min cost from childs
-            for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
-                if child_costs[c] != -1 and child_costs[c] < mincost:
-                    mincost = child_costs[c]
+                # Get min cost from childs
+                for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
+                    if child_costs[c] != -1 and child_costs[c] < mincost:
+                        mincost = child_costs[c]
 
-            if costs[p] != -1 and mincost >= costs[p]: continue
+                if costs[p] != -1 and mincost >= costs[p]: continue
 
-            A = []
-            for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
-                if child_costs[c] != -1 and child_costs[c] == mincost:
-                    A.append(1)
-                else:
-                    A.append(0)
+                A = []
+                for c in range(p * (S * (S - 1)), (p + 1) * (S * (S - 1))):
+                    if child_costs[c] != -1 and child_costs[c] == mincost:
+                        A.append(1)
+                    else:
+                        A.append(0)
 
-            if sum(A) > 0:  # otherwise no action was succesful, we simply discard the data
-                for _ in range(perms_by_layout):
-                    enum_stacks = list(range(S))
-                    perm = random.sample(enum_stacks, S)
-                    lays_copy[p].permutate(perm)
-                    A = permutate_y(A, S, perm)
+                if sum(A) > 0:  # otherwise no action was succesful, we simply discard the data
+                    for _ in range(perms_by_layout):
+                        enum_stacks = list(range(S))
+                        perm = random.sample(enum_stacks, S)
+                        lays_copy[p].permutate(perm)
+                        A = permutate_y(A, S, perm)
 
-                    x.append(adapter.get_ann_state(lays_copy[p]))
-                    y.append(deepcopy(A))
-                    if len(x) == sample_size: return np.array(x), np.array(y)
+                        x.append(adapter.get_ann_state(lays_copy[p]))
+                        y.append(deepcopy(A))
+
+                        if verbose: 
+                            load_simbol(len(x), sample_size)
+                            if len(x) < sample_size: delete_terminal_lines(1)
+
+                        if len(x) == sample_size: return np.array(x), np.array(y)
+    except Exception as e:
+        print(f"Error al generar datos!")
+        return np.array(x), np.array(y)
+    except KeyboardInterrupt:
+        print(f"Generación de datos interrumpida!")
+        if len(x) != 0: 
+            print(f'Enviando los datos generados hasta el momento...')
+            return np.array(x), np.array(y)
+        else: return None, None
