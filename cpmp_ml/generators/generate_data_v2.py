@@ -3,7 +3,6 @@ from cpmp_ml.utils.generator import generate_y
 from cpmp_ml.utils.generator import load_simbol
 from cpmp_ml.utils.adapters import DataAdapter
 from cpmp_ml.utils import generate_random_layout
-from cpmp_ml.utils import delete_terminal_lines
 from cpmp_ml.utils import Layout
 from multiprocessing import Pool
 from copy import deepcopy

@@ -6,7 +6,6 @@ from cpmp_ml.utils.generator import random_perturbate_layout
 from cpmp_ml.utils.generator import generate_y 
 from cpmp_ml.utils.generator import permutate_y
 from cpmp_ml.utils.generator import load_simbol
-from cpmp_ml.utils import delete_terminal_lines
 
 # Librerias externas
 from copy import deepcopy
