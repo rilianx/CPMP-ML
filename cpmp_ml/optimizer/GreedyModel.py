@@ -23,9 +23,10 @@ class GreedyModel(OptimizerStrategy):
             x = self.__get_valid_data(steps, costs, lays)
             if x.shape[0] == 0: break
             actions = self.__model.predict(x, verbose=False)
-            K.clear_session()
+            
             self.__update_cost(actions, costs, lays, lays_moves)
 
+        K.clear_session()
         self.__verify_solutions__(lays, lays_moves)
 
         return costs, lays_moves
