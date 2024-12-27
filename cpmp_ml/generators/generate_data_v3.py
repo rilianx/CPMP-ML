@@ -83,16 +83,14 @@ def generate_data_v3(
                         x.append(adapter.get_ann_state(lays_copy[p]))
                         y.append(deepcopy(A))
 
-                        if verbose: 
-                            load_simbol(len(x), sample_size, text="Datos generados:")
-                            if len(x) < sample_size: delete_terminal_lines(1)
+                        if verbose: load_simbol(len(x), sample_size, text="Datos generados: ")
 
                         if len(x) == sample_size: return np.array(x), np.array(y)
     except Exception as e:
-        print(f"Error al generar datos!")
+        print(f"\nError al generar datos!")
         return np.array(x), np.array(y)
     except KeyboardInterrupt:
-        print(f"Generación de datos interrumpida!")
+        print(f"\nGeneración de datos interrumpida!")
         if len(x) != 0: 
             print(f'Enviando los datos generados hasta el momento...')
             return np.array(x), np.array(y)

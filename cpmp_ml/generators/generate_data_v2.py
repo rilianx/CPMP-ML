@@ -74,19 +74,17 @@ def generate_data_v2(min_S: int,
                 if result[i][0] is None and result[i][1] is None: continue
 
                 for j in range(len(result[i][0])):
-                    if verbose: 
-                        load_simbol(len(x), size, text="Datos generados:")
-                        if len(x) < size: delete_terminal_lines(1)
+                    if verbose: load_simbol(len(x), size, text="Datos generados: ")
 
                     if len(x) == size: return x, y
             
                     x.append(result[i][0][j])
                     y.append(result[i][1][j])
     except Exception as e:
-        print(f"Error al generar datos!")
+        print(f"\nError al generar datos!")
         return np.array(x), np.array(y)
     except KeyboardInterrupt:
-        print(f"Generación de datos interrumpida!")
+        print(f"\nGeneración de datos interrumpida!")
         if len(x) != 0: 
             print(f'Enviando los datos generados hasta el momento...')
             return np.array(x), np.array(y)

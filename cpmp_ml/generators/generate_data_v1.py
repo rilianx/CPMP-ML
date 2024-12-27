@@ -71,17 +71,17 @@ def generate_data_v1(S: int = -1,
                 y.append(deepcopy(y_))
 
                 n = n + 1
-                if verbose:     
-                    load_simbol(n, sample_size, text="Datos generados:")
-                    if n < sample_size: delete_terminal_lines(1)
+                if verbose: load_simbol(n, sample_size, text="Datos generados: ")
 
                 if len(x) == sample_size: break
                 if n >= sample_size: break
+            
+            if len(x) == sample_size: break
     except Exception as e:
-        print(f"Error al generar datos!")
+        print(f"\nError al generar datos!")
         return np.array(x), np.array(y)
     except KeyboardInterrupt:
-        print(f"Generación de datos interrumpida!")
+        print(f"\nGeneración de datos interrumpida!")
         if len(x) != 0: 
             print(f'Enviando los datos generados hasta el momento...')
             return np.array(x), np.array(y)

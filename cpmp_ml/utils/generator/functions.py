@@ -9,7 +9,8 @@ def load_simbol(actual: int, total: int, text: str = '') -> None:
     complete = int((actual * 20) / total)
     left = 20 - complete
     
-    print(f"{text} {actual}/{total} [{colored('━' * complete, 'green')}{'━' * left}] {round((actual / total) * 100, 3)}%")
+    if left != 0: print(f"{text}{actual}/{total} [{colored('━' * complete, 'green')}{'━' * left}] {round((actual / total) * 100, 3)}%", end='\r')
+    else: print(f"{text}{actual}/{total} [{colored('━' * complete, 'green')}{'━' * left}] {round((actual / total) * 100, 3)}%")
 
 def costs_to_y(costs: np.ndarray, parent_cost: int) -> None | np.ndarray:
     mincost = np.inf
