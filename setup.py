@@ -20,7 +20,7 @@ setup(
         "numpy",
         "tensorflow==2.18.0"
     ],
-    python_requires= ">=3.11.9",
+    python_requires= ">=3.11",
     packages= find_packages(
         include=("cpmp_ml", "cpmp_ml.*"),
         exclude=["views", "views.*", "gui", "gui.*"]
