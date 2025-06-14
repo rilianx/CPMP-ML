@@ -51,7 +51,7 @@ def generate_data_v1(S: int = -1,
             lay = generate_random_layout(S, H, N, feasible=from_feasible)
 
             # Generar perturbación de ser necesario
-            if from_feasible: random_perturbate_layout(lays, moves=moves)
+            if from_feasible: random_perturbate_layout(lay, moves=moves)
 
             # Analizar el coste
             copy_lay = deepcopy(lay)
