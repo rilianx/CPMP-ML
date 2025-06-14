@@ -20,6 +20,7 @@ class GreedyV3(OptimizerStrategy):
         self.__temp_dir = tempfile.mkdtemp(prefix="cpmp_temp_")
         self.__use_rosetta = use_rosetta
         self.__debug_mode = debug_mode
+        self.__temp_files = []  # Lista para mantener referencia a archivos temporales
         
         # Registrar método de limpieza para asegurar que se ejecute al salir
         atexit.register(self.__cleanup_temp_dir)
@@ -42,12 +43,24 @@ class GreedyV3(OptimizerStrategy):
         """Destructor para asegurar la limpieza cuando el objeto sea eliminado"""
         self.__cleanup_temp_dir()
         
+    def __cleanup_temp_file(self, file_path):
+        """Elimina un archivo temporal específico"""
+        if file_path and os.path.exists(file_path):
+            try:
+                self.__debug_print(f"Eliminando archivo temporal: {file_path}")
+                os.remove(file_path)
+                if file_path in self.__temp_files:
+                    self.__temp_files.remove(file_path)
+            except Exception as e:
+                self.__debug_print(f"Error al eliminar archivo temporal {file_path}: {e}")
+    
     def __cleanup_temp_dir(self):
-        """Limpia los recursos temporales"""
+        """Limpia la carpeta temporal completa"""
         if hasattr(self, '_GreedyV3__temp_dir') and self.__temp_dir and os.path.exists(self.__temp_dir):
             try:
                 self.__debug_print(f"Limpiando directorio temporal: {self.__temp_dir}")
                 shutil.rmtree(self.__temp_dir, ignore_errors=True)
+                self.__temp_files = []  # Limpiar la lista de archivos temporales
             except Exception as e:
                 self.__debug_print(f"Error al eliminar directorio temporal: {e}")
 
@@ -200,16 +213,14 @@ class GreedyV3(OptimizerStrategy):
         self.__debug_print("Advertencia: Esto puede fallar si se utiliza como librería.")
 
     def solve(self, lays: np.ndarray[Layout], **kwargs) -> tuple:
+        """Resuelve los layouts usando el optimizador externo o la implementación interna"""
         self.__max_steps = kwargs.get("max_steps", 1000)
-
         costs = -np.ones(lays.shape[0])
-        try:
-            for k in range(lays.shape[0]):
-                steps, moves = self.__greedy(lays[k])
-                costs[k]=steps
-        finally:
-            # Intentar limpieza aquí también para garantizarla incluso con excepciones
-            self.__cleanup_temp_dir()
+        
+        # Ya no limpiamos la carpeta temporal aquí, solo procesamos los layouts
+        for k in range(lays.shape[0]):
+            steps, moves = self.__greedy(lays[k])
+            costs[k] = steps
             
         return costs, None
     
@@ -242,65 +253,73 @@ class GreedyV3(OptimizerStrategy):
         return int(steps_estimate)
 
     def __greedy(self, lay: Layout) -> tuple:
+        """Resuelve un único layout y limpia después de sí mismo"""
         # Crear un identificador único para este problema
         problem_id = str(uuid.uuid4())
         temp_file = os.path.join(self.__temp_dir, f"problem_{problem_id}.txt")
+        self.__temp_files.append(temp_file)  # Mantener referencia
+        
         self.__debug_print(f"Guardando el layout en el archivo temporal: {temp_file}")
+        
         # Guardar el layout en el archivo temporal
         self.__lay2file(lay, filename=temp_file)
         
-        # Verificar si el ejecutable existe
-        if not os.path.exists(self.__feg_path):
-            self.__debug_print(f"Error: No se encontró el ejecutable {self.__feg_path}")
-            steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
-            return steps, []
-        
-        # Configurar comando para ejecutable
-        command = []
-        architecture = self.__get_architecture()
-        
-        # Usar Rosetta si es necesario (para ejecutar binarios x86_64 en Apple Silicon)
-        if platform.system() == "Darwin" and self.__use_rosetta and architecture == "arm64":
-            # Verificar si el ejecutable es x86_64
-            file_info = self.__check_file_type(self.__feg_path).lower()
-            if "x86_64" in file_info and "mach-o" in file_info:
-                command = ["arch", "-x86_64"]
-                self.__debug_print("Usando Rosetta para ejecutar binario x86_64 en ARM")
-        
-        command.extend([
-            self.__feg_path, str(lay.H), temp_file, "1.2", str(self.__max_steps), "0", "0", "--no-asignment"
-        ])
-
-        self.__debug_print(f"Ejecutando comando: {' '.join(command)}")
-
         try:
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
-            self.__debug_print(f"Resultado: {result.stdout}")
-            steps = int(result.stdout.split('\t')[0])
-            moves = []  # Aquí podrías procesar los movimientos si fueran devueltos
-            return steps, moves
-        except subprocess.CalledProcessError as e:
-            self.__debug_print(f"Error ejecutando el comando: {e}")
-            self.__debug_print(f"Salida de error: {e.stderr}")
+            # Verificar si el ejecutable existe
+            if not os.path.exists(self.__feg_path):
+                self.__debug_print(f"Error: No se encontró el ejecutable {self.__feg_path}")
+                steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
+                return steps, []
             
-            if "cannot execute binary file" in e.stderr or "exec format error" in str(e):
-                self.__debug_print("El ejecutable no es compatible. Usando implementación interna.")
-                steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
-                return steps, []
+            # Configurar comando para ejecutable
+            command = []
+            architecture = self.__get_architecture()
+            
+            # Usar Rosetta si es necesario (para ejecutar binarios x86_64 en Apple Silicon)
+            if platform.system() == "Darwin" and self.__use_rosetta and architecture == "arm64":
+                # Verificar si el ejecutable es x86_64
+                file_info = self.__check_file_type(self.__feg_path).lower()
+                if "x86_64" in file_info and "mach-o" in file_info:
+                    command = ["arch", "-x86_64"]
+                    self.__debug_print("Usando Rosetta para ejecutar binario x86_64 en ARM")
+            
+            command.extend([
+                self.__feg_path, str(lay.H), temp_file, "1.2", str(self.__max_steps), "0", "0", "--no-asignment"
+            ])
+
+            self.__debug_print(f"Ejecutando comando: {' '.join(command)}")
+
+            try:
+                result = subprocess.run(command, capture_output=True, text=True, check=True)
+                self.__debug_print(f"Resultado: {result.stdout}")
+                steps = int(result.stdout.split('\t')[0])
+                moves = []  # Aquí podrías procesar los movimientos si fueran devueltos
+                return steps, moves
+            except subprocess.CalledProcessError as e:
+                self.__debug_print(f"Error ejecutando el comando: {e}")
+                self.__debug_print(f"Salida de error: {e.stderr}")
                 
-            return -1, []
-        except PermissionError:
-            self.__debug_print(f"Error de permisos: No se puede ejecutar {self.__feg_path}. Intente ejecutar 'chmod +x {self.__feg_path}' manualmente.")
-            return -1, []
-        except OSError as e:
-            if e.errno == 8:  # Exec format error
-                self.__debug_print("Error: El ejecutable no es compatible con tu arquitectura. Usando implementación interna.")
-                steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
-                return steps, []
-            else:
-                self.__debug_print(f"Error del sistema operativo: {e}")
+                if "cannot execute binary file" in e.stderr or "exec format error" in str(e):
+                    self.__debug_print("El ejecutable no es compatible. Usando implementación interna.")
+                    steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
+                    return steps, []
+                    
                 return -1, []
-        except Exception as e:
-            self.__debug_print(f"Error inesperado: {e}")
-            return -1, []
+            except PermissionError:
+                self.__debug_print(f"Error de permisos: No se puede ejecutar {self.__feg_path}. Intente ejecutar 'chmod +x {self.__feg_path}' manualmente.")
+                return -1, []
+            except OSError as e:
+                if e.errno == 8:  # Exec format error
+                    self.__debug_print("Error: El ejecutable no es compatible. Usando implementación interna.")
+                    steps = self.__simulate_feg(lay.H, temp_file, 1.2, self.__max_steps)
+                    return steps, []
+                else:
+                    self.__debug_print(f"Error del sistema operativo: {e}")
+                    return -1, []
+            except Exception as e:
+                self.__debug_print(f"Error inesperado: {e}")
+                return -1, []
+        finally:
+            # Limpiar el archivo temporal específico después de usarlo
+            self.__cleanup_temp_file(temp_file)
     
