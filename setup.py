@@ -24,5 +24,9 @@ setup(
     packages= find_packages(
         include=("cpmp_ml", "cpmp_ml.*"),
         exclude=["views", "views.*", "gui", "gui.*"]
-    )
+    ),
+    package_data={
+        "cpmp_ml": ["optimizer/GreedyV3/x86_64_feg", "optimizer/GreedyV3/arm64_feg"]
+    },
+    include_package_data=True
 )
