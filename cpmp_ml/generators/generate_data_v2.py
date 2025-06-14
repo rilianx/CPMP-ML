@@ -80,7 +80,7 @@ def generate_data_v2(min_S: int,
                     x.append(result[i][0][j])
                     y.append(result[i][1][j])
     except Exception as e:
-        print(f"\nError al generar datos!")
+        print(f"\nError al generar datos! Error: {e}")
         return np.array(x), np.array(y)
     except KeyboardInterrupt:
         print(f"\nGeneración de datos interrumpida!")

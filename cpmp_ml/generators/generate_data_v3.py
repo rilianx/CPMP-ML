@@ -86,7 +86,7 @@ def generate_data_v3(
 
                         if len(x) == sample_size: return np.array(x), np.array(y)
     except Exception as e:
-        print(f"\nError al generar datos!")
+        print(f"\nError al generar datos! Error: {e}")
         return np.array(x), np.array(y)
     except KeyboardInterrupt:
         print(f"\nGeneración de datos interrumpida!")
